@@ -23,15 +23,36 @@
       btn.classList.toggle('loading', loading);
     };
     
-    // Sign In
+    // Buttons
+    const btnAccount = $('btnAccount');
     const btnSignIn = $('btnSignIn');
     const btnSignUp = $('btnSignUp');
     const btnResetPassword = $('btnResetPassword');
     const btnSignOut = $('btnSignOut');
     const btnSyncNow = $('btnSyncNow');
-    
+    const closeAccount = $('closeAccount');
+
     const authEmail = $('authEmail');
     const authPassword = $('authPassword');
+
+    // Open Account Modal
+    if (btnAccount) {
+      btnAccount.addEventListener('click', () => {
+        const modal = $('accountModal');
+        if (modal) {
+          modal.classList.add('active');
+          updateAuthUI();
+        }
+      });
+    }
+
+    // Close Account Modal
+    if (closeAccount) {
+      closeAccount.addEventListener('click', () => {
+        const modal = $('accountModal');
+        if (modal) modal.classList.remove('active');
+      });
+    }
     
     // Enable Sign In button when fields are filled
     [authEmail, authPassword].forEach(input => {
