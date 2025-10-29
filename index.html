@@ -126,7 +126,7 @@
     .stations{display:flex; flex-direction:column; gap:10px; max-width: 100%; overflow: visible; padding-bottom: 180px;}
     /* На мобильных устройствах увеличиваем отступ снизу из-за мини-плеера и dock */
     @media (max-width: 640px) {
-      .stations{ padding-bottom: 200px; }
+      .stations{ padding-bottom: 220px; }
     }
     .station-card{
       display:flex; align-items:center; gap:14px; padding:12px;
@@ -214,8 +214,9 @@
     .mini{
       position: fixed; left:12px; right:12px; bottom:74px; z-index:35;
       display:flex; align-items:center; justify-content:space-between; gap:10px;
-      background: var(--glass); border:1.5px solid var(--border); border-radius:16px; padding:10px 12px;
-      box-shadow: var(--shadow);
+      background: var(--bg-card); border:1.5px solid var(--border); border-radius:16px; padding:10px 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.3);
+      backdrop-filter: none;
     }
     .mini.hidden{display:none}
     .mp-title{min-width:0}
