@@ -25,6 +25,9 @@
       --ring: 0 0 0 3px rgba(109,120,255,.18);
       --card-pad: 18px;
       --maxw: 1600px;
+      --mini-bg: linear-gradient(135deg, #1a1f2e 0%, #0f1419 100%);
+      --mini-border: rgba(255,255,255,0.12);
+      --mini-shadow: 0 8px 32px rgba(0,0,0,.5);
     }
     body.light-theme{
       --bg:#f5f7fb; --bg-elev:#ffffff; --glass:#ffffff;
@@ -32,6 +35,9 @@
       --text:#1a1f2e; --muted:#667289;
       --shadow:0 10px 30px rgba(0,0,0,.10);
       --ring:0 0 0 3px rgba(109,120,255,.25);
+      --mini-bg: linear-gradient(135deg, #ffffff 0%, #f8f9fc 100%);
+      --mini-border: rgba(0,0,0,.12);
+      --mini-shadow: 0 8px 32px rgba(0,0,0,.15);
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -214,10 +220,10 @@
     .mini{
       position: fixed; left:12px; right:12px; bottom:74px; z-index:35;
       display:flex; align-items:center; justify-content:space-between; gap:10px;
-      background: linear-gradient(135deg, #1a1f2e 0%, #0f1419 100%);
-      border:1.5px solid rgba(255,255,255,0.12);
+      background: var(--mini-bg);
+      border:1.5px solid var(--mini-border);
       border-radius:16px; padding:10px 12px;
-      box-shadow: 0 8px 32px rgba(0,0,0,.5);
+      box-shadow: var(--mini-shadow);
     }
     .mini.hidden{display:none}
     .mp-title{min-width:0}
