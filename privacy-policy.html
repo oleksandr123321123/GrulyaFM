@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#6D78FF" />
+  <title>Privacy Policy - GrulyaFM</title>
+  <style>
+    :root{
+      --bg: #0b0f14;
+      --bg-elev: rgba(255,255,255,0.06);
+      --glass: rgba(255,255,255,0.09);
+      --border: rgba(255,255,255,0.10);
+      --text: #eef3ff;
+      --muted: #a9b2c7;
+      --primary: #6D78FF;
+      --accent: #FF6B9D;
+      --radius: 16px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    body.light-theme{
+      --bg:#f5f7fb; --bg-elev:#ffffff; --glass:#ffffff;
+      --border: rgba(0,0,0,.10);
+      --text:#1a1f2e; --muted:#667289;
+      --shadow:0 10px 30px rgba(0,0,0,.10);
+    }
+    *{box-sizing:border-box; margin:0; padding:0;}
+    html,body{height:100%; overflow-x:hidden;}
+    body{
+      font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, system-ui, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 600px at -10% -10%, #13213a 0%, transparent 60%),
+        radial-gradient(1000px 600px at 110% -10%, #26153e 0%, transparent 55%),
+        radial-gradient(900px 500px at 50% 120%, #10221f 0%, transparent 60%),
+        var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .container{
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--glass);
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: clamp(20px, 5vw, 40px);
+      box-shadow: var(--shadow);
+    }
+    .header{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1.5px solid var(--border);
+    }
+    h1{
+      font-size: clamp(24px, 4vw, 32px);
+      font-weight: 900;
+      color: var(--text);
+    }
+    .close-btn{
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: var(--bg-elev);
+      color: var(--text);
+      font-size: 20px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: .2s;
+    }
+    .close-btn:hover{
+      transform: translateY(-2px);
+      border-color: var(--primary);
+    }
+    h2{
+      font-size: clamp(18px, 3vw, 22px);
+      font-weight: 800;
+      color: var(--text);
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+    p{
+      color: var(--text);
+      margin-bottom: 16px;
+      font-size: clamp(14px, 2vw, 16px);
+    }
+    ul, ol{
+      margin-left: 20px;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+    li{
+      margin-bottom: 8px;
+      font-size: clamp(14px, 2vw, 16px);
+    }
+    .highlight{
+      background: linear-gradient(135deg, rgba(109,120,255,.16), rgba(255,107,157,.16));
+      border: 1.5px solid var(--primary);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 16px 0;
+    }
+    .lang-selector{
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1.5px solid var(--border);
+    }
+    .lang-btn{
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: var(--bg-elev);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: .18s;
+      white-space: nowrap;
+    }
+    .lang-btn.active{
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      border-color: transparent;
+    }
+    .lang-btn:hover{
+      border-color: var(--primary);
+    }
+    .content-section{
+      display: none;
+    }
+    .content-section.active{
+      display: block;
+    }
+    @media (max-width: 640px) {
+      body{ padding: 12px; }
+      .container{ padding: 20px; }
+      .header{ flex-direction: column; gap: 12px; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 id="pageTitle">🔒 Privacy Policy</h1>
+      <button class="close-btn" onclick="window.close()" title="Close">✕</button>
+    </div>
+
+    <div class="lang-selector">
+      <button class="lang-btn" data-lang="en">English</button>
+      <button class="lang-btn active" data-lang="ru">Русский</button>
+      <button class="lang-btn" data-lang="de">Deutsch</button>
+      <button class="lang-btn" data-lang="fr">Français</button>
+      <button class="lang-btn" data-lang="es">Español</button>
+      <button class="lang-btn" data-lang="pt">Português</button>
+      <button class="lang-btn" data-lang="it">Italiano</button>
+      <button class="lang-btn" data-lang="uk">Українська</button>
+      <button class="lang-btn" data-lang="zh">中文</button>
+      <button class="lang-btn" data-lang="ja">日本語</button>
+    </div>
+
+    <!-- ENGLISH -->
+    <div class="content-section" data-lang="en">
+      <p><strong>Last updated:</strong> January 2025</p>
+
+      <h2>1. Introduction</h2>
+      <p>GrulyaFM ("we", "our", or "the application") is a global internet radio application that respects your privacy. This policy explains how we handle your data.</p>
+
+      <div class="highlight">
+        <p><strong>⚡ Key Point:</strong> GrulyaFM does not collect, store, or transmit your personal data to external servers. All your data stays on your device or in your personal Supabase account if you choose to use cloud sync.</p>
+      </div>
+
+      <h2>2. Data Storage</h2>
+      <p>The application stores the following data <strong>locally in your browser</strong>:</p>
+      <ul>
+        <li>Your favorite radio stations</li>
+        <li>Custom stations you've added</li>
+        <li>App settings (theme, language, volume, etc.)</li>
+        <li>Alarm and sleep timer settings</li>
+      </ul>
+
+      <h2>3. Cloud Synchronization (Optional)</h2>
+      <p>If you create an account using Supabase authentication:</p>
+      <ul>
+        <li>Your settings and favorites will be synced to your personal Supabase account</li>
+        <li>This is entirely optional - the app works perfectly without an account</li>
+        <li>Only you have access to this data through your account</li>
+        <li>We do not access, analyze, or share this data</li>
+      </ul>
+
+      <h2>4. Third-Party Services</h2>
+      <p>The application uses:</p>
+      <ul>
+        <li><strong>Supabase:</strong> Optional cloud sync service (if you choose to create an account)</li>
+        <li><strong>Radio Stream Providers:</strong> When you play a radio station, you connect directly to their servers</li>
+      </ul>
+
+      <h2>5. Analytics & Tracking</h2>
+      <p><strong>We do not use any analytics, tracking, or advertising services.</strong></p>
+
+      <h2>6. Your Rights</h2>
+      <p>You have full control over your data:</p>
+      <ul>
+        <li>All data is stored locally and can be cleared at any time through your browser settings</li>
+        <li>If using cloud sync, you can delete your account and all associated data at any time</li>
+        <li>No data is collected or retained by us</li>
+      </ul>
+
+      <h2>7. Contact</h2>
+      <p>If you have questions about this privacy policy, contact us at: <strong>alexandrgreen051@gmail.com</strong></p>
+    </div>
+
+    <!-- RUSSIAN -->
+    <div class="content-section active" data-lang="ru">
+      <p><strong>Последнее обновление:</strong> Январь 2025</p>
+
+      <h2>1. Введение</h2>
+      <p>GrulyaFM ("мы", "наше" или "приложение") — это глобальное интернет-радио приложение, которое уважает вашу конфиденциальность. Эта политика объясняет, как мы обрабатываем ваши данные.</p>
+
+      <div class="highlight">
+        <p><strong>⚡ Главное:</strong> GrulyaFM не собирает, не хранит и не передаёт ваши личные данные на внешние серверы. Все ваши данные остаются на вашем устройстве или в вашем личном аккаунте Supabase, если вы выберете облачную синхронизацию.</p>
+      </div>
+
+      <h2>2. Хранение данных</h2>
+      <p>Приложение хранит следующие данные <strong>локально в вашем браузере</strong>:</p>
+      <ul>
+        <li>Ваши избранные радиостанции</li>
+        <li>Пользовательские станции, которые вы добавили</li>
+        <li>Настройки приложения (тема, язык, громкость и т.д.)</li>
+        <li>Настройки будильника и таймера сна</li>
+      </ul>
+
+      <h2>3. Облачная синхронизация (опционально)</h2>
+      <p>Если вы создадите аккаунт с использованием Supabase аутентификации:</p>
+      <ul>
+        <li>Ваши настройки и избранное будут синхронизироваться с вашим личным аккаунтом Supabase</li>
+        <li>Это полностью опционально - приложение прекрасно работает без аккаунта</li>
+        <li>Только вы имеете доступ к этим данным через ваш аккаунт</li>
+        <li>Мы не получаем доступ, не анализируем и не передаём эти данные</li>
+      </ul>
+
+      <h2>4. Сторонние сервисы</h2>
+      <p>Приложение использует:</p>
+      <ul>
+        <li><strong>Supabase:</strong> Опциональный сервис облачной синхронизации (если вы создадите аккаунт)</li>
+        <li><strong>Провайдеры радиопотоков:</strong> Когда вы воспроизводите радиостанцию, вы подключаетесь напрямую к их серверам</li>
+      </ul>
+
+      <h2>5. Аналитика и отслеживание</h2>
+      <p><strong>Мы не используем никакие сервисы аналитики, отслеживания или рекламы.</strong></p>
+
+      <h2>6. Ваши права</h2>
+      <p>Вы имеете полный контроль над своими данными:</p>
+      <ul>
+        <li>Все данные хранятся локально и могут быть удалены в любое время через настройки браузера</li>
+        <li>При использовании облачной синхронизации вы можете удалить свой аккаунт и все связанные данные в любое время</li>
+        <li>Никакие данные не собираются и не хранятся нами</li>
+      </ul>
+
+      <h2>7. Контакты</h2>
+      <p>Если у вас есть вопросы об этой политике конфиденциальности, свяжитесь с нами: <strong>alexandrgreen051@gmail.com</strong></p>
+    </div>
+
+    <!-- GERMAN -->
+    <div class="content-section" data-lang="de">
+      <p><strong>Letzte Aktualisierung:</strong> Januar 2025</p>
+
+      <h2>1. Einleitung</h2>
+      <p>GrulyaFM ("wir", "unser" oder "die Anwendung") ist eine globale Internetradio-Anwendung, die Ihre Privatsphäre respektiert. Diese Richtlinie erklärt, wie wir mit Ihren Daten umgehen.</p>
+
+      <div class="highlight">
+        <p><strong>⚡ Wichtig:</strong> GrulyaFM sammelt, speichert oder überträgt Ihre persönlichen Daten nicht an externe Server. Alle Ihre Daten bleiben auf Ihrem Gerät oder in Ihrem persönlichen Supabase-Konto, falls Sie die Cloud-Synchronisierung wählen.</p>
+      </div>
+
+      <h2>2. Datenspeicherung</h2>
+      <p>Die Anwendung speichert die folgenden Daten <strong>lokal in Ihrem Browser</strong>:</p>
+      <ul>
+        <li>Ihre Lieblings-Radiosender</li>
+        <li>Benutzerdefinierte Sender, die Sie hinzugefügt haben</li>
+        <li>App-Einstellungen (Theme, Sprache, Lautstärke usw.)</li>
+        <li>Wecker- und Schlaf-Timer-Einstellungen</li>
+      </ul>
+
+      <h2>3. Cloud-Synchronisierung (optional)</h2>
+      <p>Wenn Sie ein Konto mit Supabase-Authentifizierung erstellen:</p>
+      <ul>
+        <li>Werden Ihre Einstellungen und Favoriten mit Ihrem persönlichen Supabase-Konto synchronisiert</li>
+        <li>Dies ist völlig optional - die App funktioniert perfekt ohne Konto</li>
+        <li>Nur Sie haben über Ihr Konto Zugriff auf diese Daten</li>
+        <li>Wir greifen nicht auf diese Daten zu, analysieren sie nicht und teilen sie nicht</li>
+      </ul>
+
+      <h2>4. Drittanbieter-Dienste</h2>
+      <p>Die Anwendung verwendet:</p>
+      <ul>
+        <li><strong>Supabase:</strong> Optionaler Cloud-Sync-Dienst (falls Sie ein Konto erstellen)</li>
+        <li><strong>Radio-Stream-Anbieter:</strong> Wenn Sie einen Radiosender abspielen, verbinden Sie sich direkt mit deren Servern</li>
+      </ul>
+
+      <h2>5. Analysen & Tracking</h2>
+      <p><strong>Wir verwenden keine Analyse-, Tracking- oder Werbedienste.</strong></p>
+
+      <h2>6. Ihre Rechte</h2>
+      <p>Sie haben volle Kontrolle über Ihre Daten:</p>
+      <ul>
+        <li>Alle Daten werden lokal gespeichert und können jederzeit über Ihre Browser-Einstellungen gelöscht werden</li>
+        <li>Bei Verwendung der Cloud-Synchronisierung können Sie Ihr Konto und alle zugehörigen Daten jederzeit löschen</li>
+        <li>Es werden keine Daten von uns gesammelt oder aufbewahrt</li>
+      </ul>
+
+      <h2>7. Kontakt</h2>
+      <p>Bei Fragen zu dieser Datenschutzrichtlinie kontaktieren Sie uns unter: <strong>alexandrgreen051@gmail.com</strong></p>
+    </div>
+
+    <!-- FRENCH -->
+    <div class="content-section" data-lang="fr">
+      <p><strong>Dernière mise à jour:</strong> Janvier 2025</p>
+
+      <h2>1. Introduction</h2>
+      <p>GrulyaFM ("nous", "notre" ou "l'application") est une application de radio Internet mondiale qui respecte votre vie privée. Cette politique explique comment nous traitons vos données.</p>
+
+      <div class="highlight">
+        <p><strong>⚡ Point clé:</strong> GrulyaFM ne collecte, ne stocke ni ne transmet vos données personnelles à des serveurs externes. Toutes vos données restent sur votre appareil ou dans votre compte Supabase personnel si vous choisissez d'utiliser la synchronisation cloud.</p>
+      </div>
+
+      <h2>2. Stockage des données</h2>
+      <p>L'application stocke les données suivantes <strong>localement dans votre navigateur</strong>:</p>
+      <ul>
+        <li>Vos stations de radio préférées</li>
+        <li>Les stations personnalisées que vous avez ajoutées</li>
+        <li>Paramètres de l'application (thème, langue, volume, etc.)</li>
+        <li>Paramètres d'alarme et de minuterie de sommeil</li>
+      </ul>
+
+      <h2>3. Synchronisation cloud (optionnelle)</h2>
+      <p>Si vous créez un compte avec l'authentification Supabase:</p>
+      <ul>
+        <li>Vos paramètres et favoris seront synchronisés avec votre compte Supabase personnel</li>
+        <li>C'est entièrement optionnel - l'application fonctionne parfaitement sans compte</li>
+        <li>Seul vous avez accès à ces données via votre compte</li>
+        <li>Nous n'accédons pas, n'analysons pas et ne partageons pas ces données</li>
+      </ul>
+
+      <h2>4. Services tiers</h2>
+      <p>L'application utilise:</p>
+      <ul>
+        <li><strong>Supabase:</strong> Service de synchronisation cloud optionnel (si vous créez un compte)</li>
+        <li><strong>Fournisseurs de flux radio:</strong> Lorsque vous écoutez une station de radio, vous vous connectez directement à leurs serveurs</li>
+      </ul>
+
+      <h2>5. Analyses et suivi</h2>
+      <p><strong>Nous n'utilisons aucun service d'analyse, de suivi ou de publicité.</strong></p>
+
+      <h2>6. Vos droits</h2>
+      <p>Vous avez un contrôle total sur vos données:</p>
+      <ul>
+        <li>Toutes les données sont stockées localement et peuvent être effacées à tout moment via les paramètres de votre navigateur</li>
+        <li>Si vous utilisez la synchronisation cloud, vous pouvez supprimer votre compte et toutes les données associées à tout moment</li>
+        <li>Aucune donnée n'est collectée ou conservée par nous</li>
+      </ul>
+
+      <h2>7. Contact</h2>
+      <p>Pour toute question concernant cette politique de confidentialité, contactez-nous à: <strong>alexandrgreen051@gmail.com</strong></p>
+    </div>
+
+    <!-- SPANISH -->
+    <div class="content-section" data-lang="es">
+      <p><strong>Última actualización:</strong> Enero 2025</p>
+
+      <h2>1. Introducción</h2>
+      <p>GrulyaFM ("nosotros", "nuestro" o "la aplicación") es una aplicación de radio por Internet global que respeta su privacidad. Esta política explica cómo manejamos sus datos.</p>
+
+      <div class="highlight">
+        <p><strong>⚡ Punto clave:</strong> GrulyaFM no recopila, almacena ni transmite sus datos personales a servidores externos. Todos sus datos permanecen en su dispositivo o en su cuenta personal de Supabase si elige usar la sincronización en la nube.</p>
+      </div>
+
+      <h2>2. Almacenamiento de datos</h2>
+      <p>La aplicación almacena los siguientes datos <strong>localmente en su navegador</strong>:</p>
+      <ul>
+        <li>Sus estaciones de radio favoritas</li>
+        <li>Estaciones personalizadas que ha agregado</li>
+        <li>Configuración de la aplicación (tema, idioma, volumen, etc.)</li>
+        <li>Configuración de alarma y temporizador de sueño</li>
+      </ul>
+
+      <h2>3. Sincronización en la nube (opcional)</h2>
+      <p>Si crea una cuenta usando la autenticación de Supabase:</p>
+      <ul>
+        <li>Su configuración y favoritos se sincronizarán con su cuenta personal de Supabase</li>
+        <li>Esto es completamente opcional - la aplicación funciona perfectamente sin una cuenta</li>
+        <li>Solo usted tiene acceso a estos datos a través de su cuenta</li>
+        <li>No accedemos, analizamos ni compartimos estos datos</li>
+      </ul>
+
+      <h2>4. Servicios de terceros</h2>
+      <p>La aplicación utiliza:</p>
+      <ul>
+        <li><strong>Supabase:</strong> Servicio de sincronización en la nube opcional (si elige crear una cuenta)</li>
+        <li><strong>Proveedores de transmisión de radio:</strong> Cuando reproduce una estación de radio, se conecta directamente a sus servidores</li>
+      </ul>
+
+      <h2>5. Análisis y seguimiento</h2>
+      <p><strong>No utilizamos ningún servicio de análisis, seguimiento o publicidad.</strong></p>
+
+      <h2>6. Sus derechos</h2>
+      <p>Tiene control total sobre sus datos:</p>
+      <ul>
+        <li>Todos los datos se almacenan localmente y se pueden borrar en cualquier momento a través de la configuración de su navegador</li>
+        <li>Si usa la sincronización en la nube, puede eliminar su cuenta y todos los datos asociados en cualquier momento</li>
+        <li>No recopilamos ni retenemos ningún dato</li>
+      </ul>
+
+      <h2>7. Contacto</h2>
+      <p>Si tiene preguntas sobre esta política de privacidad, contáctenos en: <strong>alexandrgreen051@gmail.com</strong></p>
+    </div>
+
+    <!-- PORTUGUESE -->
+    <div class="content-section" data-lang="pt">
+      <p><strong>Última atualização:</strong> Janeiro 2025</p>
+
+      <h2>1. Introdução</h2>
+      <p>GrulyaFM ("nós", "nosso" ou "o aplicativo") é um aplicativo de rádio pela Internet global que respeita sua privacidade. Esta política explica como lidamos com seus dados.</p>
+
+      <div class="highlight">
+        <p><strong>⚡ Ponto-chave:</strong> GrulyaFM não coleta, armazena ou transmite seus dados pessoais para servidores externos. Todos os seus dados permanecem no seu dispositivo ou na sua conta pessoal do Supabase se você optar por usar a sincronização na nuvem.</p>
+      </div>
+
+      <h2>2. Armazenamento de dados</h2>
+      <p>O aplicativo armazena os seguintes dados <strong>localmente no seu navegador</strong>:</p>
+      <ul>
+        <li>Suas estações de rádio favoritas</li>
+        <li>Estações personalizadas que você adicionou</li>
+        <li>Configurações do aplicativo (tema, idioma, volume, etc.)</li>
+        <li>Configurações de alarme e temporizador de sono</li>
+      </ul>
+
+      <h2>3. Sincronização na nuvem (opcional)</h2>
+      <p>Se você criar uma conta usando a autenticação do Supabase:</p>
+      <ul>
+        <li>Suas configurações e favoritos serão sincronizados com sua conta pessoal do Supabase</li>
+        <li>Isso é totalmente opcional - o aplicativo funciona perfeitamente sem uma conta</li>
+        <li>Apenas você tem acesso a esses dados através da sua conta</li>
+        <li>Não acessamos, analisamos ou compartilhamos esses dados</li>
+      </ul>
+
+      <h2>4. Serviços de terceiros</h2>
+      <p>O aplicativo usa:</p>
+      <ul>
+        <li><strong>Supabase:</strong> Serviço de sincronização na nuvem opcional (se você criar uma conta)</li>
+        <li><strong>Provedores de transmissão de rádio:</strong> Quando você reproduz uma estação de rádio, você se conecta diretamente aos servidores deles</li>
+      </ul>
+
+      <h2>5. Análise e rastreamento</h2>
+      <p><strong>Não usamos nenhum serviço de análise, rastreamento ou publicidade.</strong></p>
+
+      <h2>6. Seus direitos</h2>
+      <p>Você tem controle total sobre seus dados:</p>
+      <ul>
+        <li>Todos os dados são armazenados localmente e podem ser apagados a qualquer momento através das configurações do seu navegador</li>
+        <li>Se usar a sincronização na nuvem, você pode excluir sua conta e todos os dados associados a qualquer momento</li>
+        <li>Nenhum dado é coletado ou retido por nós</li>
+      </ul>
+
+      <h2>7. Contato</h2>
+      <p>Se você tiver dúvidas sobre esta política de privacidade, entre em contato conosco em: <strong>alexandrgreen051@gmail.com</strong></p>
+    </div>
+
+    <!-- ITALIAN -->
+    <div class="content-section" data-lang="it">
+      <p><strong>Ultimo aggiornamento:</strong> Gennaio 2025</p>
+
+      <h2>1. Introduzione</h2>
+      <p>GrulyaFM ("noi", "nostro" o "l'applicazione") è un'applicazione radio Internet globale che rispetta la tua privacy. Questa politica spiega come gestiamo i tuoi dati.</p>
+
+      <div class="highlight">
+        <p><strong>⚡ Punto chiave:</strong> GrulyaFM non raccoglie, memorizza o trasmette i tuoi dati personali a server esterni. Tutti i tuoi dati rimangono sul tuo dispositivo o nel tuo account Supabase personale se scegli di utilizzare la sincronizzazione cloud.</p>
+      </div>
+
+      <h2>2. Archiviazione dei dati</h2>
+      <p>L'applicazione memorizza i seguenti dati <strong>localmente nel tuo browser</strong>:</p>
+      <ul>
+        <li>Le tue stazioni radio preferite</li>
+        <li>Stazioni personalizzate che hai aggiunto</li>
+        <li>Impostazioni dell'app (tema, lingua, volume, ecc.)</li>
+        <li>Impostazioni sveglia e timer di sonno</li>
+      </ul>
+
+      <h2>3. Sincronizzazione cloud (opzionale)</h2>
+      <p>Se crei un account utilizzando l'autenticazione Supabase:</p>
+      <ul>
+        <li>Le tue impostazioni e preferiti saranno sincronizzati con il tuo account Supabase personale</li>
+        <li>Questo è del tutto opzionale - l'app funziona perfettamente senza un account</li>
+        <li>Solo tu hai accesso a questi dati tramite il tuo account</li>
+        <li>Non accediamo, analizziamo o condividiamo questi dati</li>
+      </ul>
+
+      <h2>4. Servizi di terze parti</h2>
+      <p>L'applicazione utilizza:</p>
+      <ul>
+        <li><strong>Supabase:</strong> Servizio di sincronizzazione cloud opzionale (se scegli di creare un account)</li>
+        <li><strong>Fornitori di streaming radio:</strong> Quando riproduci una stazione radio, ti connetti direttamente ai loro server</li>
+      </ul>
+
+      <h2>5. Analisi e tracciamento</h2>
+      <p><strong>Non utilizziamo alcun servizio di analisi, tracciamento o pubblicità.</strong></p>
+
+      <h2>6. I tuoi diritti</h2>
+      <p>Hai il pieno controllo sui tuoi dati:</p>
+      <ul>
+        <li>Tutti i dati sono memorizzati localmente e possono essere cancellati in qualsiasi momento tramite le impostazioni del browser</li>
+        <li>Se utilizzi la sincronizzazione cloud, puoi eliminare il tuo account e tutti i dati associati in qualsiasi momento</li>
+        <li>Nessun dato viene raccolto o conservato da noi</li>
+      </ul>
+
+      <h2>7. Contatto</h2>
+      <p>Per domande su questa politica sulla privacy, contattaci all'indirizzo: <strong>alexandrgreen051@gmail.com</strong></p>
+    </div>
+
+    <!-- UKRAINIAN -->
+    <div class="content-section" data-lang="uk">
+      <p><strong>Останнє оновлення:</strong> Січень 2025</p>
+
+      <h2>1. Вступ</h2>
+      <p>GrulyaFM ("ми", "наш" або "застосунок") — це глобальний застосунок інтернет-радіо, який поважає вашу конфіденційність. Ця політика пояснює, як ми обробляємо ваші дані.</p>
+
+      <div class="highlight">
+        <p><strong>⚡ Головне:</strong> GrulyaFM не збирає, не зберігає і не передає ваші особисті дані на зовнішні сервери. Всі ваші дані залишаються на вашому пристрої або у вашому особистому обліковому записі Supabase, якщо ви оберете хмарну синхронізацію.</p>
+      </div>
+
+      <h2>2. Зберігання даних</h2>
+      <p>Застосунок зберігає наступні дані <strong>локально у вашому браузері</strong>:</p>
+      <ul>
+        <li>Ваші улюблені радіостанції</li>
+        <li>Користувацькі станції, які ви додали</li>
+        <li>Налаштування застосунку (тема, мова, гучність тощо)</li>
+        <li>Налаштування будильника та таймера сну</li>
+      </ul>
+
+      <h2>3. Хмарна синхронізація (опціонально)</h2>
+      <p>Якщо ви створите обліковий запис з використанням автентифікації Supabase:</p>
+      <ul>
+        <li>Ваші налаштування та обране будуть синхронізуватися з вашим особистим обліковим записом Supabase</li>
+        <li>Це повністю опціонально - застосунок чудово працює без облікового запису</li>
+        <li>Тільки ви маєте доступ до цих даних через ваш обліковий запис</li>
+        <li>Ми не отримуємо доступ, не аналізуємо і не передаємо ці дані</li>
+      </ul>
+
+      <h2>4. Сторонні сервіси</h2>
+      <p>Застосунок використовує:</p>
+      <ul>
+        <li><strong>Supabase:</strong> Опціональний сервіс хмарної синхронізації (якщо ви створите обліковий запис)</li>
+        <li><strong>Провайдери радіопотоків:</strong> Коли ви відтворюєте радіостанцію, ви підключаєтесь безпосередньо до їхніх серверів</li>
+      </ul>
+
+      <h2>5. Аналітика та відстеження</h2>
+      <p><strong>Ми не використовуємо жодних сервісів аналітики, відстеження або реклами.</strong></p>
+
+      <h2>6. Ваші права</h2>
+      <p>Ви маєте повний контроль над своїми даними:</p>
+      <ul>
+        <li>Всі дані зберігаються локально і можуть бути видалені в будь-який час через налаштування браузера</li>
+        <li>При використанні хмарної синхронізації ви можете видалити свій обліковий запис та всі пов'язані дані в будь-який час</li>
+        <li>Жодні дані не збираються і не зберігаються нами</li>
+      </ul>
+
+      <h2>7. Контакти</h2>
+      <p>Якщо у вас є питання щодо цієї політики конфіденційності, зв'яжіться з нами: <strong>alexandrgreen051@gmail.com</strong></p>
+    </div>
+
+    <!-- CHINESE -->
+    <div class="content-section" data-lang="zh">
+      <p><strong>最后更新：</strong>2025年1月</p>
+
+      <h2>1. 介绍</h2>
+      <p>GrulyaFM（"我们"、"我们的"或"应用程序"）是一款尊重您隐私的全球互联网电台应用程序。本政策解释了我们如何处理您的数据。</p>
+
+      <div class="highlight">
+        <p><strong>⚡ 要点：</strong>GrulyaFM不会收集、存储或向外部服务器传输您的个人数据。所有数据都保留在您的设备上，或者如果您选择使用云同步，则保留在您的个人Supabase帐户中。</p>
+      </div>
+
+      <h2>2. 数据存储</h2>
+      <p>应用程序<strong>在您的浏览器中本地</strong>存储以下数据：</p>
+      <ul>
+        <li>您最喜欢的电台</li>
+        <li>您添加的自定义电台</li>
+        <li>应用设置（主题、语言、音量等）</li>
+        <li>闹钟和睡眠定时器设置</li>
+      </ul>
+
+      <h2>3. 云同步（可选）</h2>
+      <p>如果您使用Supabase身份验证创建帐户：</p>
+      <ul>
+        <li>您的设置和收藏夹将与您的个人Supabase帐户同步</li>
+        <li>这完全是可选的 - 应用程序在没有帐户的情况下也能完美运行</li>
+        <li>只有您可以通过您的帐户访问这些数据</li>
+        <li>我们不访问、分析或共享这些数据</li>
+      </ul>
+
+      <h2>4. 第三方服务</h2>
+      <p>应用程序使用：</p>
+      <ul>
+        <li><strong>Supabase：</strong>可选的云同步服务（如果您选择创建帐户）</li>
+        <li><strong>电台流提供商：</strong>当您播放电台时，您直接连接到他们的服务器</li>
+      </ul>
+
+      <h2>5. 分析和跟踪</h2>
+      <p><strong>我们不使用任何分析、跟踪或广告服务。</strong></p>
+
+      <h2>6. 您的权利</h2>
+      <p>您对数据拥有完全控制权：</p>
+      <ul>
+        <li>所有数据都存储在本地，可以随时通过浏览器设置清除</li>
+        <li>如果使用云同步，您可以随时删除您的帐户和所有相关数据</li>
+        <li>我们不收集或保留任何数据</li>
+      </ul>
+
+      <h2>7. 联系方式</h2>
+      <p>如果您对本隐私政策有疑问，请通过以下方式联系我们：<strong>alexandrgreen051@gmail.com</strong></p>
+    </div>
+
+    <!-- JAPANESE -->
+    <div class="content-section" data-lang="ja">
+      <p><strong>最終更新：</strong>2025年1月</p>
+
+      <h2>1. はじめに</h2>
+      <p>GrulyaFM（「当社」、「当社の」または「アプリケーション」）は、お客様のプライバシーを尊重するグローバルインターネットラジオアプリケーションです。このポリシーは、データの取り扱い方法を説明します。</p>
+
+      <div class="highlight">
+        <p><strong>⚡ 重要なポイント：</strong>GrulyaFMは、お客様の個人データを収集、保存、または外部サーバーに送信しません。すべてのデータは、お使いのデバイス上、またはクラウド同期を選択した場合は個人のSupabaseアカウントに保存されます。</p>
+      </div>
+
+      <h2>2. データストレージ</h2>
+      <p>アプリケーションは、以下のデータを<strong>ブラウザにローカルに</strong>保存します：</p>
+      <ul>
+        <li>お気に入りのラジオステーション</li>
+        <li>追加したカスタムステーション</li>
+        <li>アプリの設定（テーマ、言語、音量など）</li>
+        <li>アラームとスリープタイマーの設定</li>
+      </ul>
+
+      <h2>3. クラウド同期（オプション）</h2>
+      <p>Supabase認証を使用してアカウントを作成した場合：</p>
+      <ul>
+        <li>設定とお気に入りは個人のSupabaseアカウントに同期されます</li>
+        <li>これは完全にオプションです - アプリはアカウントなしでも完璧に動作します</li>
+        <li>このデータにアクセスできるのはお客様のみです</li>
+        <li>当社はこのデータにアクセス、分析、共有しません</li>
+      </ul>
+
+      <h2>4. サードパーティサービス</h2>
+      <p>アプリケーションは以下を使用します：</p>
+      <ul>
+        <li><strong>Supabase：</strong>オプションのクラウド同期サービス（アカウントを作成する場合）</li>
+        <li><strong>ラジオストリーミングプロバイダー：</strong>ラジオステーションを再生すると、そのサーバーに直接接続されます</li>
+      </ul>
+
+      <h2>5. 分析とトラッキング</h2>
+      <p><strong>分析、トラッキング、広告サービスは一切使用していません。</strong></p>
+
+      <h2>6. お客様の権利</h2>
+      <p>データを完全にコントロールできます：</p>
+      <ul>
+        <li>すべてのデータはローカルに保存されており、ブラウザの設定からいつでもクリアできます</li>
+        <li>クラウド同期を使用している場合、アカウントと関連するすべてのデータをいつでも削除できます</li>
+        <li>当社によってデータが収集または保持されることはありません</li>
+      </ul>
+
+      <h2>7. お問い合わせ</h2>
+      <p>このプライバシーポリシーについてご質問がある場合は、こちらまでご連絡ください：<strong>alexandrgreen051@gmail.com</strong></p>
+    </div>
+
+  </div>
+
+  <script>
+    // Language switching
+    const langButtons = document.querySelectorAll('.lang-btn');
+    const contentSections = document.querySelectorAll('.content-section');
+    const pageTitle = document.getElementById('pageTitle');
+
+    const titles = {
+      en: '🔒 Privacy Policy',
+      ru: '🔒 Политика конфиденциальности',
+      de: '🔒 Datenschutzrichtlinie',
+      fr: '🔒 Politique de confidentialité',
+      es: '🔒 Política de privacidad',
+      pt: '🔒 Política de privacidade',
+      it: '🔒 Informativa sulla privacy',
+      uk: '🔒 Політика конфіденційності',
+      zh: '🔒 隐私政策',
+      ja: '🔒 プライバシーポリシー'
+    };
+
+    // Get language from URL or default to 'ru'
+    const urlParams = new URLSearchParams(window.location.search);
+    let currentLang = urlParams.get('lang') || 'ru';
+
+    function setLanguage(lang) {
+      currentLang = lang;
+
+      // Update buttons
+      langButtons.forEach(btn => {
+        if (btn.dataset.lang === lang) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      // Update content
+      contentSections.forEach(section => {
+        if (section.dataset.lang === lang) {
+          section.classList.add('active');
+        } else {
+          section.classList.remove('active');
+        }
+      });
+
+      // Update page title
+      pageTitle.textContent = titles[lang] || titles.en;
+
+      // Update URL without reload
+      const newUrl = new URL(window.location);
+      newUrl.searchParams.set('lang', lang);
+      window.history.pushState({}, '', newUrl);
+    }
+
+    // Initialize with current language
+    setLanguage(currentLang);
+
+    // Add click handlers
+    langButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        setLanguage(btn.dataset.lang);
+      });
+    });
+
+    // Detect theme from parent window (if opened from main app)
+    try {
+      if (window.opener && window.opener.document.body.classList.contains('light-theme')) {
+        document.body.classList.add('light-theme');
+      }
+    } catch (e) {
+      // Cross-origin access might fail, ignore
+    }
+  </script>
+</body>
+</html>
