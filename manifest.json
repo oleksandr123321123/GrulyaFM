@@ -3,7 +3,7 @@
   "short_name": "GrulyaFM",
   "description": "Global Radio with 200+ stations from 22 countries. Listen to radio stations worldwide.",
   "start_url": "/",
-  "id": "/",
+  "id": "/?app=grulya-fm-2024",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
