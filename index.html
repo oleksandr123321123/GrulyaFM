@@ -107,6 +107,20 @@
     .player{ align-self: start; height:auto; }
     @media (max-width: 640px){ .player{ display: none; } }
     @media (min-width:1024px){ .player{ position: sticky; top: 90px; } }
+
+    /* Мобильная панель действий */
+    .mobile-actions{
+      display: none;
+      background: var(--mini-bg);
+      border: 1.5px solid var(--mini-border);
+      border-radius: 14px;
+      padding: 8px;
+      margin: 12px 0;
+      gap: 8px;
+      box-shadow: var(--mini-shadow);
+      justify-content: center;
+    }
+    @media (max-width: 640px){ .mobile-actions{ display: flex; } }
     .player .top{ display:grid; gap:8px; text-align:center; margin-bottom:12px; }
     #stationName{font-size: clamp(18px, 1.2vw + 14px, 22px); font-weight:800}
     #trackMetadata{color:var(--muted); font-size:13px}
@@ -533,6 +547,13 @@ body{ max-width: 100vw; }
         🎲 <span id="randomBtnText" style="margin-left:8px">Случайная станция</span>
       </button>
     </section>
+
+    <!-- Мобильная панель действий -->
+    <div class="mobile-actions" aria-label="Quick actions">
+      <button id="timerBtnMobile" class="action-btn" title="Sleep Timer">💤</button>
+      <button id="alarmBtnMobile" class="action-btn" title="Alarm">⏰</button>
+      <button id="addStationBtnMobile" class="action-btn" title="Add Station">➕</button>
+    </div>
 
     <section class="grid">
       <aside class="card player" aria-label="Player">

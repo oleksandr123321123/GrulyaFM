@@ -1580,6 +1580,11 @@ document.getElementById('addStationBtn').addEventListener('click', () => {
   document.getElementById('addStationModal').classList.add('active');
 });
 
+// Mobile Add Station Button
+document.getElementById('addStationBtnMobile')?.addEventListener('click', () => {
+  document.getElementById('addStationModal').classList.add('active');
+});
+
 document.getElementById('closeAddStation').addEventListener('click', () => {
   document.getElementById('addStationModal').classList.remove('active');
 });
@@ -1618,6 +1623,11 @@ document.getElementById('saveStation').addEventListener('click', () => {
 
 // Sleep Timer Modal
 document.getElementById('timerBtn').addEventListener('click', () => {
+  document.getElementById('timerModal').classList.add('active');
+});
+
+// Mobile Sleep Timer Button
+document.getElementById('timerBtnMobile')?.addEventListener('click', () => {
   document.getElementById('timerModal').classList.add('active');
 });
 
@@ -1719,6 +1729,14 @@ document.querySelectorAll('.timer-option').forEach(option => {
 document.getElementById('alarmBtn').addEventListener('click', () => {
   const stations = getFilteredStations();
   // постраиваем кастомный список + наполняем скрытый select
+  buildAlarmCustomSelect(stations);
+  document.getElementById('alarmModal').classList.add('active');
+  renderWeekdays();
+});
+
+// Mobile Alarm Button
+document.getElementById('alarmBtnMobile')?.addEventListener('click', () => {
+  const stations = getFilteredStations();
   buildAlarmCustomSelect(stations);
   document.getElementById('alarmModal').classList.add('active');
   renderWeekdays();
