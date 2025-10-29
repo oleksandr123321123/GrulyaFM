@@ -1629,6 +1629,9 @@ document.getElementById('closeTimer').addEventListener('click', () => {
 let timerEndTime = null;
 let timerUpdateInterval = null;
 
+// Переменная для интервала проверки будильника
+let alarmInterval = null;
+
 // Функция обновления отображения таймера
 function updateTimerDisplay() {
   if (!timerEndTime) {
