@@ -50,6 +50,7 @@ const TRANSLATIONS = {
     all: '🌐 All',
     favorites: '❤️ Favorites',
     alarm: 'Alarm',
+    remaining: 'Remaining',
     aboutTitle: 'About GrulyaFM',
     aboutLead: 'GrulyaFM — global internet radio. Design and development: Grulya.',
     contactTitle: 'Contact',
@@ -103,6 +104,7 @@ const TRANSLATIONS = {
     all: '🌐 Все',
     favorites: '❤️ Избранное',
     alarm: 'Будильник',
+    remaining: 'Осталось',
     aboutTitle: 'О приложении GrulyaFM',
     aboutLead: 'GrulyaFM — глобальное интернет-радио. Дизайн и разработка: Grulya.',
     contactTitle: 'Контакты',
@@ -156,6 +158,7 @@ const TRANSLATIONS = {
     all: '🌐 Alle',
     favorites: '❤️ Favoriten',
     alarm: 'Wecker',
+    remaining: 'Verbleibend',
     aboutTitle: 'Über GrulyaFM',
     aboutLead: 'GrulyaFM — globales Internetradio. Design und Entwicklung: Grulya.',
     contactTitle: 'Kontakt',
@@ -209,6 +212,7 @@ const TRANSLATIONS = {
     all: '🌐 Tout',
     favorites: '❤️ Favoris',
     alarm: 'Alarme',
+    remaining: 'Restant',
     aboutTitle: 'À propos de GrulyaFM',
     aboutLead: 'GrulyaFM — radio Internet mondiale. Design et développement: Grulya.',
     contactTitle: 'Contact',
@@ -262,6 +266,7 @@ const TRANSLATIONS = {
     all: '🌐 Todo',
     favorites: '❤️ Favoritos',
     alarm: 'Alarma',
+    remaining: 'Restante',
     aboutTitle: 'Acerca de GrulyaFM',
     aboutLead: 'GrulyaFM — radio por Internet global. Diseño y desarrollo: Grulya.',
     contactTitle: 'Contacto',
@@ -315,6 +320,7 @@ const TRANSLATIONS = {
     all: '🌐 Todos',
     favorites: '❤️ Favoritos',
     alarm: 'Alarme',
+    remaining: 'Restante',
     aboutTitle: 'Sobre GrulyaFM',
     aboutLead: 'GrulyaFM — rádio pela Internet global. Design e desenvolvimento: Grulya.',
     contactTitle: 'Contato',
@@ -368,6 +374,7 @@ const TRANSLATIONS = {
     all: '🌐 Tutto',
     favorites: '❤️ Preferiti',
     alarm: 'Sveglia',
+    remaining: 'Rimanente',
     aboutTitle: 'Informazioni su GrulyaFM',
     aboutLead: 'GrulyaFM — radio Internet globale. Design e sviluppo: Grulya.',
     contactTitle: 'Contatto',
@@ -421,6 +428,7 @@ const TRANSLATIONS = {
     all: '🌐 Усі',
     favorites: '❤️ Обране',
     alarm: 'Будильник',
+    remaining: 'Залишилось',
     aboutTitle: 'Про GrulyaFM',
     aboutLead: 'GrulyaFM — глобальне інтернет-радіо. Дизайн і розробка: Grulya.',
     contactTitle: 'Контакти',
@@ -474,6 +482,7 @@ const TRANSLATIONS = {
     all: '🌐 全部',
     favorites: '❤️ 收藏',
     alarm: '闹钟',
+    remaining: '剩余',
     aboutTitle: '关于 GrulyaFM',
     aboutLead: 'GrulyaFM — 全球互联网电台。设计和开发：Grulya。',
     contactTitle: '联系',
@@ -527,6 +536,7 @@ const TRANSLATIONS = {
     all: '🌐 すべて',
     favorites: '❤️ お気に入り',
     alarm: 'アラーム',
+    remaining: '残り',
     aboutTitle: 'GrulyaFMについて',
     aboutLead: 'GrulyaFM — グローバルインターネットラジオ。デザインと開発：Grulya。',
     contactTitle: '連絡先',
@@ -1615,15 +1625,69 @@ document.getElementById('closeTimer').addEventListener('click', () => {
   document.getElementById('timerModal').classList.remove('active');
 });
 
+// Переменные для таймера сна с обратным отсчётом
+let timerEndTime = null;
+let timerUpdateInterval = null;
+
+// Функция обновления отображения таймера
+function updateTimerDisplay() {
+  if (!timerEndTime) {
+    document.getElementById('timerDisplay').classList.remove('active');
+    return;
+  }
+
+  const now = Date.now();
+  const remainingMs = timerEndTime - now;
+
+  if (remainingMs <= 0) {
+    document.getElementById('timerDisplay').classList.remove('active');
+    if (timerUpdateInterval) {
+      clearInterval(timerUpdateInterval);
+      timerUpdateInterval = null;
+    }
+    timerEndTime = null;
+    return;
+  }
+
+  const totalMinutes = Math.ceil(remainingMs / 60000);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  let timeText = '';
+  if (hours > 0) {
+    timeText = `${hours}:${minutes.toString().padStart(2, '0')}`;
+  } else {
+    timeText = `${minutes} ${t('min')}`;
+  }
+
+  document.getElementById('timerText').textContent = `💤 ${t('sleepTimer')}`;
+  document.getElementById('timerRemaining').textContent = `⏱️ ${t('remaining')}: ${timeText}`;
+  document.getElementById('timerDisplay').classList.add('active');
+}
+
 document.querySelectorAll('.timer-option').forEach(option => {
   option.addEventListener('click', () => {
     if (option.id === 'cancelTimer') {
       if (state.sleepTimer) clearTimeout(state.sleepTimer);
       state.sleepTimer = null;
+      timerEndTime = null;
+      if (timerUpdateInterval) {
+        clearInterval(timerUpdateInterval);
+        timerUpdateInterval = null;
+      }
+      document.getElementById('timerDisplay').classList.remove('active');
       showToast('⏰ ' + t('timerCancelled'));
     } else {
       const minutes = parseInt(option.dataset.minutes);
       if (state.sleepTimer) clearTimeout(state.sleepTimer);
+      if (timerUpdateInterval) clearInterval(timerUpdateInterval);
+
+      // Устанавливаем время окончания таймера
+      timerEndTime = Date.now() + (minutes * 60 * 1000);
+
+      // Обновляем отображение каждую секунду
+      updateTimerDisplay();
+      timerUpdateInterval = setInterval(updateTimerDisplay, 1000);
 
       state.sleepTimer = setTimeout(async () => {
         audio.pause();
@@ -1632,6 +1696,14 @@ document.querySelectorAll('.timer-option').forEach(option => {
         await releaseWakeLock();
         showToast('💤 ' + t('goodNight'));
         updateMiniPlayer();
+
+        // Скрываем индикатор таймера
+        timerEndTime = null;
+        if (timerUpdateInterval) {
+          clearInterval(timerUpdateInterval);
+          timerUpdateInterval = null;
+        }
+        document.getElementById('timerDisplay').classList.remove('active');
       }, minutes * 60 * 1000);
 
       showToast(`⏰ ${t('timerSet')} ${minutes} ${t('min')}`);

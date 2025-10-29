@@ -151,12 +151,15 @@
     .station-card.compact .station-country{font-size:11px !important; opacity:.8}
     .station-card.compact .fav-btn{font-size:18px !important; width:34px; height:34px}
 
-    /* Alarm pill */
+    /* Alarm & Timer pills */
     .pill{display:none}
     .pill.active{display:block}
     #alarmDisplay{border:1.5px dashed var(--success); background: linear-gradient(120deg, rgba(78,205,196,.12), rgba(109,120,255,.10)); border-radius:16px; padding:12px}
     #alarmText{font-weight:800}
     #alarmDays{color:var(--muted); font-size:12px}
+    #timerDisplay{border:1.5px dashed #9b87f5; background: linear-gradient(120deg, rgba(155,135,245,.12), rgba(120,200,255,.10)); border-radius:16px; padding:12px}
+    #timerText{font-weight:800}
+    #timerRemaining{color:var(--muted); font-size:12px}
 
     /* Modals */
     .modal{position:fixed; inset:0; display:none; place-items:center; z-index:50; backdrop-filter: blur(8px); background: rgba(0,0,0,.45)}
@@ -521,6 +524,11 @@ body{ max-width: 100vw; }
         <div id="alarmDisplay" class="pill" style="margin-bottom:10px">
           <div id="alarmText">⏰ Будильник: 07:00</div>
           <div id="alarmDays">Пн, Вт, Ср, Чт, Пт</div>
+        </div>
+
+        <div id="timerDisplay" class="pill" style="margin-bottom:10px">
+          <div id="timerText">💤 Sleep Timer: 15:00</div>
+          <div id="timerRemaining" style="color:var(--muted); font-size:12px">Осталось: 15 мин</div>
         </div>
 
         <div class="top">
