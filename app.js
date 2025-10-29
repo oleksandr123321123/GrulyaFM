@@ -1850,4 +1850,86 @@ document.addEventListener('keydown', (e)=>{
     document.querySelectorAll('.modal.active').forEach(m=>m.classList.remove('active'));
 });
 
+// === AUTO-RECONNECT: Автоматическое переподключение при обрыве потока ===
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 10;
+let reconnectTimeout = null;
+
+// Обработчик ошибок audio
+audio.addEventListener('error', (e) => {
+  console.error('❌ Audio error:', e);
+
+  if (state.isPlaying && state.currentStation && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+    reconnectAttempts++;
+    console.log(`🔄 Attempting reconnect ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}...`);
+
+    // Пробуем переподключиться через 2 секунды
+    clearTimeout(reconnectTimeout);
+    reconnectTimeout = setTimeout(() => {
+      if (state.currentStation) {
+        console.log('🔄 Reconnecting to:', state.currentStation.name);
+        setStream(audio, state.currentStation.url);
+        audio.play().then(() => {
+          console.log('✅ Reconnected successfully!');
+          reconnectAttempts = 0; // Сбрасываем счётчик при успешном подключении
+        }).catch(err => {
+          console.error('❌ Reconnect failed:', err);
+        });
+      }
+    }, 2000);
+  } else if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+    console.error('❌ Max reconnect attempts reached. Stopping playback.');
+    showToast('❌ Connection lost. Please try another station.');
+    state.isPlaying = false;
+    document.getElementById('playBtn').textContent = '▶️';
+    updateMiniPlayer();
+    releaseWakeLock();
+    reconnectAttempts = 0;
+  }
+});
+
+// Обработчик stalled (поток завис)
+audio.addEventListener('stalled', () => {
+  console.warn('⚠️ Audio stream stalled, attempting to resume...');
+  if (state.isPlaying && state.currentStation) {
+    audio.load();
+    audio.play().catch(err => {
+      console.error('❌ Resume failed:', err);
+    });
+  }
+});
+
+// Обработчик ended (поток завершился)
+audio.addEventListener('ended', () => {
+  console.log('⚠️ Audio stream ended');
+  if (state.isPlaying && state.currentStation) {
+    console.log('🔄 Stream ended, restarting...');
+    audio.play().catch(err => {
+      console.error('❌ Restart failed:', err);
+    });
+  }
+});
+
+// Обработчик waiting (буферизация)
+audio.addEventListener('waiting', () => {
+  console.log('⏳ Buffering...');
+  document.getElementById('trackMetadata').textContent = t('connecting');
+});
+
+// Обработчик playing (возобновление воспроизведения)
+audio.addEventListener('playing', () => {
+  console.log('▶️ Playing...');
+  if (state.currentStation) {
+    document.getElementById('trackMetadata').textContent = `${state.currentStation.country} • ${t('live')} • ${state.currentStation.bitrate ?? 128} kbps`;
+  }
+  reconnectAttempts = 0; // Сбрасываем счётчик попыток при успешном воспроизведении
+});
+
+// Обработчик pause (только логирование, не переподключаемся при намеренной паузе)
+audio.addEventListener('pause', () => {
+  console.log('⏸️ Paused');
+});
+
+console.log('✅ Auto-reconnect handlers initialized');
+
 // End of app.js
