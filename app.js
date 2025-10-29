@@ -854,6 +854,9 @@ console.log('✅ Supabase sync module loaded');
 
 const audio = document.getElementById('audio');
 
+// Wake Lock для предотвращения блокировки экрана во время воспроизведения
+let wakeLock = null;
+
 // Global stations object
 let allStations = {};
 
@@ -899,6 +902,82 @@ function showToast(message) {
   toast.textContent = message;
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
+}
+
+// === WAKE LOCK API для предотвращения блокировки экрана ===
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      console.log('✅ Wake Lock активирован');
+
+      wakeLock.addEventListener('release', () => {
+        console.log('⚠️ Wake Lock освобожден');
+      });
+    }
+  } catch (err) {
+    console.log('❌ Wake Lock не поддерживается или отклонен:', err);
+  }
+}
+
+async function releaseWakeLock() {
+  if (wakeLock !== null) {
+    try {
+      await wakeLock.release();
+      wakeLock = null;
+      console.log('✅ Wake Lock освобожден вручную');
+    } catch (err) {
+      console.log('❌ Ошибка освобождения Wake Lock:', err);
+    }
+  }
+}
+
+// Восстановление Wake Lock при возврате на страницу
+document.addEventListener('visibilitychange', async () => {
+  if (wakeLock !== null && document.visibilityState === 'visible' && state.isPlaying) {
+    await requestWakeLock();
+  }
+});
+
+// === MEDIA SESSION API для фонового воспроизведения ===
+function updateMediaSession(station) {
+  if ('mediaSession' in navigator && station) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: station.name,
+      artist: `${station.country} • GrulyaFM`,
+      album: 'Global Radio',
+      artwork: [
+        { src: '/icon-96.png', sizes: '96x96', type: 'image/png' },
+        { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+        { src: '/icon-512.png', sizes: '512x512', type: 'image/png' }
+      ]
+    });
+
+    navigator.mediaSession.setActionHandler('play', () => {
+      audio.play();
+      state.isPlaying = true;
+      document.getElementById('playBtn').textContent = '⏸️';
+      updateMiniPlayer();
+    });
+
+    navigator.mediaSession.setActionHandler('pause', async () => {
+      audio.pause();
+      state.isPlaying = false;
+      document.getElementById('playBtn').textContent = '▶️';
+      await releaseWakeLock();
+      updateMiniPlayer();
+    });
+
+    navigator.mediaSession.setActionHandler('stop', async () => {
+      audio.pause();
+      state.isPlaying = false;
+      document.getElementById('playBtn').textContent = '▶️';
+      await releaseWakeLock();
+      updateMiniPlayer();
+    });
+
+    console.log('✅ Media Session обновлена для:', station.name);
+  }
 }
 
 // Load stations from stations.json
@@ -1086,11 +1165,18 @@ function playStation(station) {
   document.getElementById('stationName').textContent = station.name;
   document.getElementById('trackMetadata').textContent = t('connecting');
 
-  audio.play().then(() => {
+  audio.play().then(async () => {
     state.isPlaying = true;
     document.getElementById('playBtn').textContent = '⏸️';
     document.getElementById('trackMetadata').textContent = `${station.country} • ${t('live')} • ${station.bitrate ?? 128} kbps`;
     showToast(`▶️ ${station.name}`);
+
+    // Активируем Wake Lock для предотвращения блокировки экрана
+    await requestWakeLock();
+
+    // Обновляем Media Session для фонового воспроизведения
+    updateMediaSession(station);
+
     renderStations();
     updateMiniPlayer();
   }).catch(() => {
@@ -1248,6 +1334,39 @@ function renderWeekdays() {
   });
 }
 
+// === NOTIFICATION API для будильника ===
+async function requestNotificationPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    try {
+      const permission = await Notification.requestPermission();
+      console.log('📢 Notification permission:', permission);
+      return permission === 'granted';
+    } catch (err) {
+      console.log('❌ Notification permission error:', err);
+      return false;
+    }
+  }
+  return Notification.permission === 'granted';
+}
+
+function showAlarmNotification(stationName) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    const notification = new Notification('⏰ GrulyaFM Будильник', {
+      body: `${t('goodMorning')}\n🎵 ${stationName}`,
+      icon: '/icon-192.png',
+      badge: '/icon-96.png',
+      tag: 'alarm',
+      requireInteraction: true,
+      vibrate: [200, 100, 200, 100, 200]
+    });
+
+    notification.onclick = () => {
+      window.focus();
+      notification.close();
+    };
+  }
+}
+
 // Check alarm
 function checkAlarm() {
   if (!state.alarm) return;
@@ -1260,6 +1379,10 @@ function checkAlarm() {
     const stations = getFilteredStations();
     const station = stations.find(s => s.id === state.alarm.stationId);
     if (station) {
+      // Показываем уведомление
+      showAlarmNotification(station.name);
+
+      // Запускаем станцию
       playStation(station);
       showToast('⏲️ ' + t('goodMorning'));
     }
@@ -1357,17 +1480,19 @@ document.getElementById('randomBtn').addEventListener('click', () => {
 });
 
 // Play/Pause Button
-document.getElementById('playBtn').addEventListener('click', () => {
+document.getElementById('playBtn').addEventListener('click', async () => {
   if (!state.currentStation) return showToast(t('selectStation'));
 
   if (state.isPlaying) {
     audio.pause();
     state.isPlaying = false;
     document.getElementById('playBtn').textContent = '▶️';
+    await releaseWakeLock();
   } else {
-    audio.play();
+    await audio.play();
     state.isPlaying = true;
     document.getElementById('playBtn').textContent = '⏸️';
+    await requestWakeLock();
   }
   updateMiniPlayer();
 });
@@ -1500,10 +1625,11 @@ document.querySelectorAll('.timer-option').forEach(option => {
       const minutes = parseInt(option.dataset.minutes);
       if (state.sleepTimer) clearTimeout(state.sleepTimer);
 
-      state.sleepTimer = setTimeout(() => {
+      state.sleepTimer = setTimeout(async () => {
         audio.pause();
         state.isPlaying = false;
         document.getElementById('playBtn').textContent = '▶️';
+        await releaseWakeLock();
         showToast('💤 ' + t('goodNight'));
         updateMiniPlayer();
       }, minutes * 60 * 1000);
@@ -1528,7 +1654,7 @@ document.getElementById('closeAlarm').addEventListener('click', () => {
 });
 
 // Set / Cancel Alarm
-document.getElementById('setAlarm').addEventListener('click', () => {
+document.getElementById('setAlarm').addEventListener('click', async () => {
   const time = document.getElementById('alarmTime').value;
   const stationId = document.getElementById('alarmStation').value; // из скрытого select
   const selectedDays = Array.from(document.querySelectorAll('.weekday.active')).map(el => parseInt(el.dataset.day));
@@ -1536,6 +1662,9 @@ document.getElementById('setAlarm').addEventListener('click', () => {
   if (!time || selectedDays.length === 0 || !stationId) {
     return showToast(t('fillAllFields'));
   }
+
+  // Запрашиваем разрешение на уведомления
+  await requestNotificationPermission();
 
   state.alarm = { time, stationId, days: selectedDays };
   saveToStorage();
@@ -1594,16 +1723,18 @@ function deleteMyStation(url) {
 }
 
 // Mini-player controls
-document.getElementById('miniPlay').addEventListener('click', () => {
+document.getElementById('miniPlay').addEventListener('click', async () => {
   if (!state.currentStation) return showToast(t('selectStation'));
   if (state.isPlaying) {
     audio.pause();
     state.isPlaying = false;
     document.getElementById('playBtn').textContent = '▶️';
+    await releaseWakeLock();
   } else {
-    audio.play();
+    await audio.play();
     state.isPlaying = true;
     document.getElementById('playBtn').textContent = '⏸️';
+    await requestWakeLock();
   }
   updateMiniPlayer();
 });
