@@ -181,9 +181,9 @@ jobs:
           # Setup Android SDK path
           export ANDROID_SDK_ROOT=$ANDROID_HOME
 
-          # Инициализировать если нужно (автоматически использует установленный JDK и Android SDK)
+          # Let Bubblewrap install JDK and Android SDK automatically
           if [ ! -d "android" ]; then
-            { echo "n"; echo "$JAVA_HOME"; echo "n"; echo "$ANDROID_HOME"; } | bubblewrap init --manifest=twa-manifest.json || true
+            yes | bubblewrap init --manifest=twa-manifest.json || true
           fi
 
           # Обновить проект
