@@ -26,13 +26,13 @@
     {
       "name": "Random Station",
       "short_name": "Random",
-      "url": "/?random=true",
+      "url": "https://grulya-fm.vercel.app/?random=true",
       "chosenIconUrl": "https://grulya-fm.vercel.app/icon-192.png"
     },
     {
       "name": "Favorites",
       "short_name": "Favorites",
-      "url": "/?tab=favorites",
+      "url": "https://grulya-fm.vercel.app/?tab=favorites",
       "chosenIconUrl": "https://grulya-fm.vercel.app/icon-192.png"
     }
   ],
