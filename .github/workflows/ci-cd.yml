@@ -186,11 +186,19 @@ jobs:
             yes | bubblewrap init --manifest=twa-manifest.json || true
           fi
 
-          # Обновить проект
-          bubblewrap update
+          # Verify android directory exists
+          if [ ! -d "android" ]; then
+            echo "❌ Android project not initialized!"
+            exit 1
+          fi
 
-          # Собрать AAB
-          bubblewrap build
+          echo "✅ Android project initialized successfully"
+
+          # Обновить проект (answer yes to all prompts)
+          yes | bubblewrap update || true
+
+          # Собрать AAB (answer yes to all prompts)
+          yes | bubblewrap build
         env:
           BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
