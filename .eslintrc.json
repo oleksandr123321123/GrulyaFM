@@ -1,0 +1,36 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true,
+    "serviceworker": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-unused-vars": ["warn", {
+      "argsIgnorePattern": "^_",
+      "varsIgnorePattern": "^_"
+    }],
+    "no-console": "off",
+    "semi": ["error", "always"],
+    "quotes": ["warn", "single", { "allowTemplateLiterals": true }],
+    "no-var": "error",
+    "prefer-const": "warn",
+    "no-multiple-empty-lines": ["warn", { "max": 2 }],
+    "eqeqeq": ["error", "always"],
+    "curly": ["error", "multi-line"],
+    "brace-style": ["warn", "1tbs", { "allowSingleLine": true }]
+  },
+  "ignorePatterns": [
+    "node_modules/",
+    "android/",
+    ".vercel/",
+    "dist/",
+    "build/",
+    "*.min.js"
+  ]
+}

@@ -1,0 +1,278 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [master, main, develop]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  # Линтинг и проверка кода
+  lint:
+    name: Lint & Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+
+      - name: Run ESLint
+        run: npx eslint . --ext .js,.jsx --max-warnings 0
+        continue-on-error: true
+
+      - name: Check for console.logs
+        run: |
+          if grep -r "console\.log" app.js supabase-sync.js --exclude-dir=node_modules; then
+            echo "⚠️ Found console.log statements"
+            exit 0
+          fi
+
+      - name: Check for TODO comments
+        run: |
+          echo "📝 TODO items found:"
+          grep -r "TODO\|FIXME\|XXX" . --exclude-dir=node_modules --exclude-dir=.git || echo "None"
+
+  # Тесты безопасности
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Check for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --only-verified
+
+      - name: Check .gitignore
+        run: |
+          if [ ! -f .gitignore ]; then
+            echo "❌ .gitignore missing!"
+            exit 1
+          fi
+
+          # Check critical patterns
+          if ! grep -q "\.keystore" .gitignore; then
+            echo "⚠️ .gitignore should include *.keystore"
+          fi
+          if ! grep -q "\.env" .gitignore; then
+            echo "⚠️ .gitignore should include .env"
+          fi
+
+  # Lighthouse CI для проверки производительности
+  lighthouse:
+    name: Lighthouse CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.12.x
+
+      - name: Run Lighthouse CI
+        run: |
+          lhci autorun --collect.url=https://grulya-fm.vercel.app \
+            --collect.numberOfRuns=3 \
+            --upload.target=temporary-public-storage
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+        continue-on-error: true
+
+  # Service Worker прогрев
+  sw-warmup:
+    name: Service Worker Warmup
+    runs-on: ubuntu-latest
+    needs: [lint]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check Service Worker
+        run: |
+          if [ ! -f sw.js ]; then
+            echo "❌ Service Worker (sw.js) not found!"
+            exit 1
+          fi
+
+          echo "✅ Service Worker found"
+
+          # Check cache version is updated
+          CACHE_VERSION=$(grep "CACHE_NAME\|const.*CACHE.*=" sw.js | head -1)
+          echo "Cache version: $CACHE_VERSION"
+
+      - name: Validate Service Worker syntax
+        run: node -c sw.js
+
+      - name: Check for cache strategies
+        run: |
+          if grep -q "caches.match\|cache.put" sw.js; then
+            echo "✅ Cache strategies found"
+          else
+            echo "⚠️ No cache strategies in Service Worker"
+          fi
+
+  # Сборка Android APK/AAB (только для тегов)
+  build-android:
+    name: Build Android App
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [lint, security]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Bubblewrap CLI
+        run: npm install -g @bubblewrap/cli
+
+      - name: Build TWA
+        run: |
+          # Инициализировать если нужно
+          if [ ! -d "android" ]; then
+            bubblewrap init --manifest=twa-manifest.json
+          fi
+
+          # Обновить проект
+          bubblewrap update
+
+          # Собрать AAB
+          bubblewrap build
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 30
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: android/app/build/outputs/bundle/release/app-release.aab
+          draft: true
+          body: |
+            ## GrulyaFM Release ${{ github.ref_name }}
+
+            ### Changes
+            - See commit history for details
+
+            ### Installation
+            1. Download `app-release.aab`
+            2. Upload to Google Play Console
+            3. Submit for review
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Deploy to Vercel (уже настроено через Vercel GitHub integration)
+  verify-deployment:
+    name: Verify Deployment
+    runs-on: ubuntu-latest
+    needs: [lint, security]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+
+    steps:
+      - name: Wait for Vercel deployment
+        run: sleep 30
+
+      - name: Check site is live
+        run: |
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://grulya-fm.vercel.app)
+          if [ "$HTTP_CODE" -eq 200 ]; then
+            echo "✅ Site is live (HTTP $HTTP_CODE)"
+          else
+            echo "❌ Site returned HTTP $HTTP_CODE"
+            exit 1
+          fi
+
+      - name: Check PWA manifest
+        run: |
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://grulya-fm.vercel.app/manifest.json)
+          if [ "$HTTP_CODE" -eq 200 ]; then
+            echo "✅ manifest.json accessible"
+          else
+            echo "❌ manifest.json not found"
+            exit 1
+          fi
+
+      - name: Check Service Worker
+        run: |
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://grulya-fm.vercel.app/sw.js)
+          if [ "$HTTP_CODE" -eq 200 ]; then
+            echo "✅ Service Worker accessible"
+          else
+            echo "❌ Service Worker not found"
+            exit 1
+          fi
+
+      - name: Check assetlinks.json
+        run: |
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://grulya-fm.vercel.app/.well-known/assetlinks.json)
+          if [ "$HTTP_CODE" -eq 200 ]; then
+            echo "✅ assetlinks.json accessible"
+          else
+            echo "⚠️ assetlinks.json not found (needed for Android TWA)"
+          fi
+
+  # Уведомление об успешном деплое
+  notify-success:
+    name: Notify Success
+    runs-on: ubuntu-latest
+    needs: [lint, security, lighthouse, sw-warmup, verify-deployment]
+    if: success() && github.event_name == 'push' && github.ref == 'refs/heads/master'
+
+    steps:
+      - name: Notify success
+        run: |
+          echo "🎉 CI/CD Pipeline completed successfully!"
+          echo "📦 Build: ${{ github.sha }}"
+          echo "🚀 Deployed to: https://grulya-fm.vercel.app"

@@ -871,6 +871,62 @@ console.log('✅ Supabase sync module loaded');
 
 const audio = document.getElementById('audio');
 
+// === iOS SAFARI AUDIO UNLOCK ===
+// Safari требует первое воспроизведение аудио по жесту пользователя
+let iOSAudioUnlocked = false;
+
+function unlockIOSAudio() {
+  if (iOSAudioUnlocked) return;
+
+  // Detect iOS
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+  if (isIOS || isSafari) {
+    console.log('🍎 iOS/Safari detected, unlocking audio context...');
+
+    // Create silent audio to unlock
+    const silentAudio = new Audio();
+    silentAudio.src = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADhAC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAA4S/3rrbAAAAAAAAAAAAAAAAAAAAAP/7kGQAD/AAAGkAAAAIAAANIAAAAQAAAaQAAAAgAAA0gAAABExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uQZAYP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAETEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+5BkDg/wAABpAAAACAAADSAAAAEAAAGkAAAAIAAANIAAAARMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7kGQWD/AAAGkAAAAIAAANIAAAAQAAAaQAAAAgAAA0gAAABExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV';
+    silentAudio.preload = 'auto';
+
+    const unlock = () => {
+      silentAudio.play()
+        .then(() => {
+          console.log('✅ iOS audio unlocked successfully');
+          iOSAudioUnlocked = true;
+          silentAudio.pause();
+          silentAudio.remove();
+
+          // Remove listeners after unlock
+          document.body.removeEventListener('touchstart', unlock);
+          document.body.removeEventListener('touchend', unlock);
+          document.body.removeEventListener('click', unlock);
+        })
+        .catch(err => {
+          console.log('⏳ Waiting for user gesture to unlock audio...', err.message);
+        });
+    };
+
+    // Listen for first touch/click
+    document.body.addEventListener('touchstart', unlock, { once: true, passive: true });
+    document.body.addEventListener('touchend', unlock, { once: true, passive: true });
+    document.body.addEventListener('click', unlock, { once: true });
+
+    // Also try to unlock immediately (sometimes works)
+    unlock();
+  } else {
+    iOSAudioUnlocked = true; // Not iOS, no need to unlock
+  }
+}
+
+// Call unlock on page load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', unlockIOSAudio);
+} else {
+  unlockIOSAudio();
+}
+
 // Wake Lock для предотвращения блокировки экрана во время воспроизведения
 let wakeLock = null;
 

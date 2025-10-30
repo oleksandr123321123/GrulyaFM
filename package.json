@@ -1,12 +1,47 @@
 {
-  "name": "grulyafm-dev-proxy",
+  "name": "grulyafm",
+  "version": "1.0.0",
+  "description": "GrulyaFM - Global Radio with 200+ stations from 22 countries",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node server.mjs"
+    "dev": "node server.mjs",
+    "build": "echo 'Static site, no build needed'",
+    "lint": "eslint . --ext .js --max-warnings 0",
+    "lint:fix": "eslint . --ext .js --fix",
+    "test": "echo 'No tests yet'",
+    "lighthouse": "lhci autorun",
+    "audit": "npm audit --audit-level=moderate",
+    "check-secrets": "echo 'Run: git log --all --full-history -- \"*.keystore\"'",
+    "build:android": "bubblewrap build",
+    "generate-vapid": "web-push generate-vapid-keys"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oleksandr123321123/GrulyaFM.git"
+  },
+  "keywords": [
+    "radio",
+    "streaming",
+    "pwa",
+    "music",
+    "global",
+    "web-audio"
+  ],
+  "author": "GrulyaFM Team",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.21.2",
     "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@lhci/cli": "^0.12.0",
+    "@bubblewrap/cli": "^1.20.0",
+    "eslint": "^8.57.0",
+    "web-push": "^3.6.7"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }
