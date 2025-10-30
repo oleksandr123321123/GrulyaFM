@@ -76,7 +76,7 @@
         
         updateButton(btnSignIn, true);
         
-        const { data, error } = await window.supabase.auth.signInWithPassword({
+        const { error } = await window.supabase.auth.signInWithPassword({
           email,
           password
         });
@@ -109,7 +109,7 @@
         
         updateButton(btnSignUp, true);
         
-        const { data, error } = await window.supabase.auth.signUp({
+        const { error } = await window.supabase.auth.signUp({
           email,
           password
         });
@@ -207,7 +207,7 @@
     }
     
     // Listen to auth changes
-    window.supabase.auth.onAuthStateChange((event, session) => {
+    window.supabase.auth.onAuthStateChange((event) => {
       console.log('🔐 Auth state changed:', event);
       updateAuthUI();
     });

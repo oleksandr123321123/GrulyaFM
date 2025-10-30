@@ -18,7 +18,8 @@ webpush.setVapidDetails(
 
 // In-memory хранилище (для продакшена используйте БД)
 // Для Vercel можно использовать Vercel KV, Supabase, или другую БД
-let subscriptions = [];
+// eslint-disable-next-line prefer-const
+const subscriptions = [];
 
 export default async function handler(req, res) {
   // CORS headers

@@ -1,20 +1,19 @@
-const CACHE_NAME = 'grulya-fm-v5';
 const STATIC_CACHE = 'grulya-fm-static-v5';
 const DYNAMIC_CACHE = 'grulya-fm-dynamic-v5';
 const IMAGE_CACHE = 'grulya-fm-images-v5';
 const OFFLINE_URL = '/offline.html';
 
 const urlsToCache = [
-  "/",
-  "/index.html",
-  "/app.js",
-  "/manifest.json",
-  "/favicon.ico",
-  "/icon-72.png",
-  "/icon-96.png",
-  "/icon-144.png",
-  "/icon-192.png",
-  "/icon-512.png",
+  '/',
+  '/index.html',
+  '/app.js',
+  '/manifest.json',
+  '/favicon.ico',
+  '/icon-72.png',
+  '/icon-96.png',
+  '/icon-144.png',
+  '/icon-192.png',
+  '/icon-512.png',
   OFFLINE_URL
 ];
 

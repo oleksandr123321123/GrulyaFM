@@ -575,7 +575,7 @@ const COUNTRY_NAMES = {
   TR: 'Turkey',
   BR: 'Brazil',
   MX: 'Mexico',
-  RU: "Russia",
+  RU: 'Russia',
   AR: 'Argentina',
   CA: 'Canada',
   AU: 'Australia',
@@ -1355,7 +1355,7 @@ async function loadStations() {
 }
 
 // Load state from localStorage
-function loadFromStorage() {
+function loadFromLocalStorage_deprecated() {
   try {
     const saved = localStorage.getItem('grulyafm_state');
     if (saved) {
@@ -1398,7 +1398,7 @@ function loadFromStorage() {
 }
 
 // Save state to localStorage
-function saveToStorage() {
+function saveToLocalStorage_deprecated() {
   try {
     localStorage.setItem('grulyafm_state', JSON.stringify({
       favorites: state.favorites,
@@ -1413,7 +1413,7 @@ function saveToStorage() {
       lastPlayedStation: state.currentStation // Сохраняем текущую станцию
     }));
     // если пользователь авторизован — синкнем в фоне (не мешает UX)
-    getCurrentUser().then(u => { if (u) saveUserStateToCloud(); });
+    getCurrentUser().then(u => { if (u) saveToSupabase(); });
   } catch (error) {
     console.error('Error saving state:', error);
   }
@@ -1829,7 +1829,7 @@ function buildAlarmCustomSelect(stations) {
   nativeSelect.innerHTML = stations.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
 
   // choose current
-  let currentId = nativeSelect.value || stations[0]?.id || '';
+  const currentId = nativeSelect.value || stations[0]?.id || '';
   nativeSelect.value = currentId;
 
   // build custom list
@@ -2182,7 +2182,7 @@ function deleteMyStation(url) {
 
   // если играло это радио — остановим
   if (state.currentStation && state.currentStation.url === removed.url) {
-    try { audio.pause(); } catch(e){}
+    try { audio.pause(); } catch(e){ /* ignore */ }
     state.currentStation = null;
     state.isPlaying = false;
     document.getElementById('playBtn').textContent = '▶️';
@@ -2330,8 +2330,7 @@ document.addEventListener('click', (e)=>{
   if (modal && e.target === modal) modal.classList.remove('active');
 });
 document.addEventListener('keydown', (e)=>{
-  if (e.key === 'Escape')
-    document.querySelectorAll('.modal.active').forEach(m=>m.classList.remove('active'));
+  if (e.key === 'Escape') {document.querySelectorAll('.modal.active').forEach(m=>m.classList.remove('active'));}
 });
 
 // === AUTO-RECONNECT: Автоматическое переподключение при обрыве потока с exponential backoff ===
