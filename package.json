@@ -13,8 +13,9 @@
     "lighthouse": "lhci autorun",
     "audit": "npm audit --audit-level=moderate",
     "check-secrets": "echo 'Run: git log --all --full-history -- \"*.keystore\"'",
+    "check-ready": "node check-deployment-ready.cjs",
     "build:android": "bubblewrap build",
-    "generate-vapid": "web-push generate-vapid-keys"
+    "generate-vapid": "node generate-vapid-keys.cjs"
   },
   "repository": {
     "type": "git",
