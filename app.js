@@ -1005,20 +1005,131 @@ function clearHistory() {
   console.log('🗑️ History cleared');
 }
 
-// Получить метаданные из Icecast/Shoutcast потока
-async function fetchStreamMetadata() {
+// === METADATA API & CACHING ===
+const METADATA_CACHE_KEY = 'grulyafm_metadata_cache';
+const METADATA_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+// Кэш метаданных в памяти
+const metadataCache = new Map();
+
+// Получить метаданные из кэша
+function getCachedMetadata(stationUrl) {
+  const cached = metadataCache.get(stationUrl);
+  if (cached && Date.now() - cached.timestamp < METADATA_CACHE_TTL) {
+    return cached.data;
+  }
+  return null;
+}
+
+// Сохранить метаданные в кэш
+function cacheMetadata(stationUrl, metadata) {
+  metadataCache.set(stationUrl, {
+    data: metadata,
+    timestamp: Date.now()
+  });
+
+  // Также сохраняем в localStorage (ограничено 50 записей)
   try {
-    // Пытаемся получить метаданные через API (если есть)
-    // Большинство радио не предоставляют CORS для метаданных
-    // Поэтому используем fallback на название станции
+    const stored = JSON.parse(localStorage.getItem(METADATA_CACHE_KEY) || '{}');
+    stored[stationUrl] = { metadata, timestamp: Date.now() };
+
+    // Ограничиваем размер кэша
+    const entries = Object.entries(stored);
+    if (entries.length > 50) {
+      // Удаляем самые старые записи
+      const sorted = entries.sort((a, b) => b[1].timestamp - a[1].timestamp);
+      const limited = Object.fromEntries(sorted.slice(0, 50));
+      localStorage.setItem(METADATA_CACHE_KEY, JSON.stringify(limited));
+    } else {
+      localStorage.setItem(METADATA_CACHE_KEY, JSON.stringify(stored));
+    }
+  } catch (e) {
+    console.error('Error caching metadata:', e);
+  }
+}
+
+// Получить метаданные из Radio Browser API (легальный источник)
+async function fetchStreamMetadata() {
+  if (!state.currentStation) return null;
+
+  // Проверяем кэш
+  const cached = getCachedMetadata(state.currentStation.url);
+  if (cached) {
+    console.log('📦 Using cached metadata');
+    return cached;
+  }
+
+  try {
+    // Radio Browser API - бесплатный и легальный источник метаданных
+    const apiUrl = `https://de1.api.radio-browser.info/json/stations/byurl/${encodeURIComponent(state.currentStation.url)}`;
+
+    const response = await fetch(apiUrl, {
+      headers: {
+        'User-Agent': 'GrulyaFM/1.0'
+      }
+    });
+
+    if (!response.ok) throw new Error('API request failed');
+
+    const data = await response.json();
+
+    if (data && data.length > 0) {
+      const station = data[0];
+      const metadata = {
+        title: station.name || state.currentStation.name,
+        artist: station.tags || state.currentStation.country,
+        albumArt: station.favicon || '/icon-192.png',
+        genre: station.tags || 'Unknown',
+        bitrate: station.bitrate || state.currentStation.bitrate || 128,
+        codec: station.codec || 'MP3',
+        homepage: station.homepage || null
+      };
+
+      // Кэшируем результат
+      cacheMetadata(state.currentStation.url, metadata);
+      console.log('✅ Fetched metadata from Radio Browser API');
+
+      return metadata;
+    }
+
+    // Fallback на базовую информацию
+    const fallback = {
+      title: state.currentStation.name,
+      artist: `${state.currentStation.country} • Live`,
+      albumArt: '/icon-192.png',
+      bitrate: state.currentStation.bitrate || 128
+    };
+
+    cacheMetadata(state.currentStation.url, fallback);
+    return fallback;
+
+  } catch (error) {
+    console.error('Error fetching metadata:', error);
+
+    // Возвращаем базовую информацию при ошибке
     return {
       title: state.currentStation?.name || 'Live Radio',
       artist: state.currentStation?.country || 'Unknown',
       albumArt: '/icon-192.png'
     };
-  } catch (error) {
-    console.error('Error fetching metadata:', error);
-    return null;
+  }
+}
+
+// Загрузить кэш метаданных из localStorage при старте
+function loadMetadataCache() {
+  try {
+    const stored = localStorage.getItem(METADATA_CACHE_KEY);
+    if (stored) {
+      const data = JSON.parse(stored);
+      Object.entries(data).forEach(([url, item]) => {
+        if (Date.now() - item.timestamp < METADATA_CACHE_TTL) {
+          metadataCache.set(url, item);
+        }
+      });
+      console.log(`📦 Loaded ${metadataCache.size} cached metadata entries`);
+    }
+  } catch (e) {
+    console.error('Error loading metadata cache:', e);
   }
 }
 
@@ -2100,6 +2211,9 @@ function animate() {
 
   // Загружаем историю треков
   loadHistory();
+
+  // Загружаем кэш метаданных
+  loadMetadataCache();
 
   // Загружаем станции
   loadStations();
