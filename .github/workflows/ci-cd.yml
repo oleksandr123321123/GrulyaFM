@@ -170,14 +170,20 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Install Bubblewrap CLI
         run: npm install -g @bubblewrap/cli
 
       - name: Build TWA
         run: |
-          # Инициализировать если нужно
+          # Setup Android SDK path
+          export ANDROID_SDK_ROOT=$ANDROID_HOME
+
+          # Инициализировать если нужно (автоматически использует установленный JDK и Android SDK)
           if [ ! -d "android" ]; then
-            bubblewrap init --manifest=twa-manifest.json
+            bubblewrap init --manifest=twa-manifest.json --jdkPath=$JAVA_HOME --androidSdkPath=$ANDROID_HOME
           fi
 
           # Обновить проект
