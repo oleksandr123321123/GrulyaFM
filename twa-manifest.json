@@ -17,8 +17,8 @@
   "monochromeIconUrl": "https://grulya-fm.vercel.app/icon-monochrome.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
-    "path": "./android.keystore",
-    "alias": "grulyafm-key"
+    "path": "./upload.keystore",
+    "alias": "upload-key"
   },
   "appVersionName": "1.0.0",
   "appVersionCode": 1,
@@ -27,13 +27,13 @@
       "name": "Random Station",
       "short_name": "Random",
       "url": "/?random=true",
-      "icon": "https://grulya-fm.vercel.app/icon-192.png"
+      "chosenIconUrl": "https://grulya-fm.vercel.app/icon-192.png"
     },
     {
       "name": "Favorites",
       "short_name": "Favorites",
       "url": "/?tab=favorites",
-      "icon": "https://grulya-fm.vercel.app/icon-192.png"
+      "chosenIconUrl": "https://grulya-fm.vercel.app/icon-192.png"
     }
   ],
   "enableSiteSettingsShortcut": true,
