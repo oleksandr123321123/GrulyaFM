@@ -183,11 +183,7 @@ jobs:
 
           # Инициализировать если нужно (автоматически использует установленный JDK и Android SDK)
           if [ ! -d "android" ]; then
-            printf "n
-%s
-n
-%s
-" "$JAVA_HOME" "$ANDROID_HOME" | bubblewrap init --manifest=twa-manifest.json || true
+            { echo "n"; echo "$JAVA_HOME"; echo "n"; echo "$ANDROID_HOME"; } | bubblewrap init --manifest=twa-manifest.json || true
           fi
 
           # Обновить проект
