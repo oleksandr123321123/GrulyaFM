@@ -1,0 +1,60 @@
+{
+  "packageId": "app.vercel.grulya_fm.twa",
+  "host": "grulya-fm.vercel.app",
+  "name": "GrulyaFM - Global Radio",
+  "launcherName": "GrulyaFM",
+  "display": "standalone",
+  "themeColor": "#6D78FF",
+  "navigationColor": "#0b0f14",
+  "navigationColorDark": "#0b0f14",
+  "navigationDividerColor": "#0b0f14",
+  "navigationDividerColorDark": "#0b0f14",
+  "backgroundColor": "#0b0f14",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://grulya-fm.vercel.app/icon-512.png",
+  "maskableIconUrl": "https://grulya-fm.vercel.app/icon-512.png",
+  "monochromeIconUrl": "https://grulya-fm.vercel.app/icon-monochrome.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "grulyafm-key"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "Random Station",
+      "short_name": "Random",
+      "url": "/?random=true",
+      "icon": "https://grulya-fm.vercel.app/icon-192.png"
+    },
+    {
+      "name": "Favorites",
+      "short_name": "Favorites",
+      "url": "/?tab=favorites",
+      "icon": "https://grulya-fm.vercel.app/icon-192.png"
+    }
+  ],
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "orientation": "default",
+  "minSdkVersion": 23,
+  "targetSdkVersion": 34,
+  "features": {
+    "playBilling": {
+      "enabled": false
+    },
+    "locationDelegation": {
+      "enabled": false
+    },
+    "webViewFallback": {
+      "enabled": true
+    }
+  },
+  "fallbackType": "customtabs",
+  "enableDefaultUrl": true,
+  "alphaDependencies": {
+    "enabled": false
+  }
+}
