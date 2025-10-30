@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "app.vercel.grulya_fm.twa",
+    "sha256_cert_fingerprints": [
+      "11:13:66:59:75:61:0C:83:65:6D:C8:45:57:25:F5:A8:E8:02:AC:98:57:E6:AB:4A:D9:68:FC:60:C9:A7:26:47"
+    ]
+  }
+}]

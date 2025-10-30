@@ -567,22 +567,22 @@ body{ max-width: 100vw; }
           <div id="timerRemaining" style="color:var(--muted); font-size:12px">Осталось: 15 мин</div>
         </div>
 
-        <div class="top">
-          <div id="stationName">Выберите станцию</div>
-          <div id="trackMetadata">Нажмите на станцию ниже</div>
+        <div class="top" role="status" aria-live="polite">
+          <div id="stationName" aria-label="Current station">Выберите станцию</div>
+          <div id="trackMetadata" aria-label="Track information">Нажмите на станцию ниже</div>
         </div>
 
         <div id="visualizer" aria-hidden="true"></div>
 
-        <div class="controls" role="group" aria-label="Playback">
-          <button id="prevBtn" class="btn-circle sm" aria-label="Previous">⏮️</button>
-          <button id="playBtn" class="btn-circle" aria-label="Play/Pause">▶️</button>
-          <button id="nextBtn" class="btn-circle sm" aria-label="Next">⏭️</button>
+        <div class="controls" role="group" aria-label="Playback controls">
+          <button id="prevBtn" class="btn-circle sm" aria-label="Previous station" title="Previous (←)">⏮️</button>
+          <button id="playBtn" class="btn-circle" aria-label="Play or pause" title="Play/Pause (Space)">▶️</button>
+          <button id="nextBtn" class="btn-circle sm" aria-label="Next station" title="Next (→)">⏭️</button>
         </div>
 
-        <div class="volume" aria-label="Volume">
+        <div class="volume" role="group" aria-label="Volume control">
           <span aria-hidden="true">🔈</span>
-          <div id="volumeSlider" class="slider">
+          <div id="volumeSlider" class="slider" role="slider" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="70" tabindex="0">
             <div id="volumeFill"></div>
           </div>
           <span aria-hidden="true">🔊</span>

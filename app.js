@@ -599,7 +599,14 @@ const state = {
   myStations: [],
   alarm: null,
   sleepTimer: null,
-  compact: false // компактный режим списка
+  compact: false, // компактный режим списка
+  resumePlayback: false, // автовоспроизведение при загрузке
+  lastPlayedStation: null, // последняя воспроизведенная станция
+  trackHistory: [], // история треков (max 50)
+  currentMetadata: null, // текущие метаданные трека
+  preferredBitrate: 'auto', // auto, 64, 128, 320
+  genreFilter: 'all', // фильтр по жанру
+  countryFilter: 'all' // фильтр по стране
 };
 
 // ===== Supabase auth & cloud sync =====
@@ -949,6 +956,132 @@ document.addEventListener('visibilitychange', async () => {
   }
 });
 
+// === TRACK HISTORY & METADATA ===
+// Добавить трек в историю
+function addToHistory(track) {
+  const historyItem = {
+    station: state.currentStation?.name || 'Unknown',
+    title: track.title || 'Unknown Track',
+    artist: track.artist || state.currentStation?.name || 'Unknown Artist',
+    timestamp: Date.now(),
+    albumArt: track.albumArt || '/icon-192.png'
+  };
+
+  // Добавляем в начало списка
+  state.trackHistory.unshift(historyItem);
+
+  // Ограничиваем историю 50 треками
+  if (state.trackHistory.length > 50) {
+    state.trackHistory = state.trackHistory.slice(0, 50);
+  }
+
+  // Сохраняем в localStorage
+  try {
+    localStorage.setItem('grulyafm_history', JSON.stringify(state.trackHistory));
+  } catch (e) {
+    console.error('Error saving history:', e);
+  }
+
+  console.log('📝 Track added to history:', historyItem);
+}
+
+// Загрузить историю из localStorage
+function loadHistory() {
+  try {
+    const saved = localStorage.getItem('grulyafm_history');
+    if (saved) {
+      state.trackHistory = JSON.parse(saved);
+      console.log(`📚 Loaded ${state.trackHistory.length} tracks from history`);
+    }
+  } catch (e) {
+    console.error('Error loading history:', e);
+  }
+}
+
+// Очистить историю
+function clearHistory() {
+  state.trackHistory = [];
+  localStorage.removeItem('grulyafm_history');
+  console.log('🗑️ History cleared');
+}
+
+// Получить метаданные из Icecast/Shoutcast потока
+async function fetchStreamMetadata() {
+  try {
+    // Пытаемся получить метаданные через API (если есть)
+    // Большинство радио не предоставляют CORS для метаданных
+    // Поэтому используем fallback на название станции
+    return {
+      title: state.currentStation?.name || 'Live Radio',
+      artist: state.currentStation?.country || 'Unknown',
+      albumArt: '/icon-192.png'
+    };
+  } catch (error) {
+    console.error('Error fetching metadata:', error);
+    return null;
+  }
+}
+
+// === BITRATE SELECTION & NETWORK QUALITY ===
+// Определить качество сети
+function getNetworkQuality() {
+  if ('connection' in navigator) {
+    const conn = navigator.connection || navigator['mozConnection'] || navigator['webkitConnection'];
+
+    if (conn) {
+      const effectiveType = conn.effectiveType; // 'slow-2g', '2g', '3g', '4g'
+      const downlink = conn.downlink; // Mbps
+
+      console.log(`📶 Network: ${effectiveType}, ${downlink} Mbps`);
+
+      // Рекомендуем битрейт на основе качества сети
+      if (effectiveType === 'slow-2g' || effectiveType === '2g' || downlink < 0.5) {
+        return 64; // Low quality
+      } else if (effectiveType === '3g' || downlink < 1.5) {
+        return 128; // Medium quality
+      } else {
+        return 320; // High quality
+      }
+    }
+  }
+
+  // Fallback: средний битрейт
+  return 128;
+}
+
+// Выбрать URL станции на основе предпочитаемого битрейта
+function selectStreamUrl(station) {
+  if (state.preferredBitrate === 'auto') {
+    const recommendedBitrate = getNetworkQuality();
+    console.log(`🎵 Auto bitrate: ${recommendedBitrate} kbps`);
+
+    // Если станция имеет несколько потоков, выбираем подходящий
+    // Пока используем основной URL
+    return station.url;
+  }
+
+  // Если указан конкретный битрейт, пытаемся его использовать
+  // (В будущем можно расширить stations.json для поддержки нескольких URL)
+  return station.url;
+}
+
+// Отслеживать изменения сети и автоматически переключать качество
+if ('connection' in navigator) {
+  const conn = navigator.connection || navigator['mozConnection'] || navigator['webkitConnection'];
+  if (conn) {
+    conn.addEventListener('change', () => {
+      if (state.preferredBitrate === 'auto' && state.isPlaying && state.currentStation) {
+        const newQuality = getNetworkQuality();
+        console.log(`📶 Network changed, recommended bitrate: ${newQuality} kbps`);
+        showToast(`📶 Network quality changed`);
+
+        // Можно автоматически переключить поток если сеть ухудшилась
+        // Но это может прервать воспроизведение, поэтому оставляем на усмотрение пользователя
+      }
+    });
+  }
+}
+
 // === MEDIA SESSION API для фонового воспроизведения ===
 function updateMediaSession(station) {
   if ('mediaSession' in navigator && station) {
@@ -963,6 +1096,7 @@ function updateMediaSession(station) {
       ]
     });
 
+    // Play action
     navigator.mediaSession.setActionHandler('play', () => {
       audio.play();
       state.isPlaying = true;
@@ -970,6 +1104,7 @@ function updateMediaSession(station) {
       updateMiniPlayer();
     });
 
+    // Pause action
     navigator.mediaSession.setActionHandler('pause', async () => {
       audio.pause();
       state.isPlaying = false;
@@ -978,6 +1113,7 @@ function updateMediaSession(station) {
       updateMiniPlayer();
     });
 
+    // Stop action
     navigator.mediaSession.setActionHandler('stop', async () => {
       audio.pause();
       state.isPlaying = false;
@@ -985,6 +1121,50 @@ function updateMediaSession(station) {
       await releaseWakeLock();
       updateMiniPlayer();
     });
+
+    // Previous track - play previous station in list
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+      const stations = getFilteredStations();
+      if (stations.length === 0) return;
+
+      const currentIndex = stations.findIndex(s => s === state.currentStation);
+      const prevIndex = currentIndex > 0 ? currentIndex - 1 : stations.length - 1;
+      const prevStation = stations[prevIndex];
+
+      playStation(prevStation);
+      showToast(`⏮️ ${prevStation.name}`);
+    });
+
+    // Next track - play next station in list
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+      const stations = getFilteredStations();
+      if (stations.length === 0) return;
+
+      const currentIndex = stations.findIndex(s => s === state.currentStation);
+      const nextIndex = (currentIndex + 1) % stations.length;
+      const nextStation = stations[nextIndex];
+
+      playStation(nextStation);
+      showToast(`⏭️ ${nextStation.name}`);
+    });
+
+    // Seek backward (optional - skip 10 seconds back if stream supports it)
+    try {
+      navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+        audio.currentTime = Math.max(audio.currentTime - (details.seekOffset || 10), 0);
+      });
+    } catch (error) {
+      // Not all browsers support seekbackward
+    }
+
+    // Seek forward (optional - skip 10 seconds forward if stream supports it)
+    try {
+      navigator.mediaSession.setActionHandler('seekforward', (details) => {
+        audio.currentTime = Math.min(audio.currentTime + (details.seekOffset || 10), audio.duration);
+      });
+    } catch (error) {
+      // Not all browsers support seekforward
+    }
 
     console.log('✅ Media Session обновлена для:', station.name);
   }
@@ -1021,6 +1201,8 @@ function loadFromStorage() {
       state.myStations = savedState.myStations || [];
       state.alarm = savedState.alarm || null;
       state.compact = savedState.compact === true;
+      state.resumePlayback = savedState.resumePlayback === true;
+      state.lastPlayedStation = savedState.lastPlayedStation || null;
 
       if (!state.isDarkTheme) {
         document.body.classList.add('light-theme');
@@ -1034,6 +1216,13 @@ function loadFromStorage() {
 
       if (state.alarm) {
         updateAlarmDisplay();
+      }
+
+      // Восстанавливаем последнюю станцию (но не автовоспроизводим без user gesture)
+      if (state.lastPlayedStation) {
+        state.currentStation = state.lastPlayedStation;
+        updateMiniPlayer();
+        console.log('🎵 Restored last played station:', state.lastPlayedStation.name);
       }
     }
   } catch (error) {
@@ -1052,7 +1241,9 @@ function saveToStorage() {
       language: state.language,
       myStations: state.myStations,
       alarm: state.alarm,
-      compact: state.compact
+      compact: state.compact,
+      resumePlayback: state.resumePlayback,
+      lastPlayedStation: state.currentStation // Сохраняем текущую станцию
     }));
     // если пользователь авторизован — синкнем в фоне (не мешает UX)
     getCurrentUser().then(u => { if (u) saveUserStateToCloud(); });
@@ -1077,16 +1268,32 @@ function getFilteredStations() {
   // Сохранение в облако если пользователь авторизован
   getCurrentUser().then(u => { if (u) saveToSupabase(); });
 
+  // Поиск по названию, стране и жанру
   if (state.searchQuery) {
+    const query = state.searchQuery.toLowerCase();
     stations = stations.filter(s =>
-      s.name.toLowerCase().includes(state.searchQuery.toLowerCase())
+      s.name.toLowerCase().includes(query) ||
+      s.country.toLowerCase().includes(query) ||
+      (s.genre && s.genre.toLowerCase().includes(query)) ||
+      COUNTRY_NAMES[s.country]?.toLowerCase().includes(query)
     );
   }
 
+  // Фильтр по вкладке
   if (state.activeTab === 'favorites') {
-    stations = stations.filter(s => state.favorites.includes(s.id));
+    stations = stations.filter(s => state.favorites.some(f => f.url === s.url));
   } else if (state.activeTab !== 'all') {
     stations = stations.filter(s => s.country === state.activeTab);
+  }
+
+  // Фильтр по жанру (если добавлен)
+  if (state.genreFilter && state.genreFilter !== 'all') {
+    stations = stations.filter(s => s.genre === state.genreFilter);
+  }
+
+  // Фильтр по стране (дополнительный, кроме вкладок)
+  if (state.countryFilter && state.countryFilter !== 'all') {
+    stations = stations.filter(s => s.country === state.countryFilter);
   }
 
   return stations;
@@ -1186,6 +1393,16 @@ function playStation(station) {
 
     // Обновляем Media Session для фонового воспроизведения
     updateMediaSession(station);
+
+    // Добавляем трек в историю
+    addToHistory({
+      title: station.name,
+      artist: `${station.country} • Live`,
+      albumArt: '/icon-192.png'
+    });
+
+    // Сохраняем текущую станцию для восстановления при перезагрузке
+    saveToStorage();
 
     renderStations();
     updateMiniPlayer();
@@ -1530,6 +1747,7 @@ document.getElementById('volumeSlider').addEventListener('click', (e) => {
   state.volume = Math.max(0, Math.min(100, percent * 100));
   audio.volume = state.volume / 100;
   document.getElementById('volumeFill').style.width = `${state.volume}%`;
+  e.currentTarget.setAttribute('aria-valuenow', Math.round(state.volume));
   saveToStorage();
 });
 
@@ -1879,7 +2097,10 @@ function animate() {
   
   // Загружаем данные (из Supabase или localStorage)
   await loadFromStorage();
-  
+
+  // Загружаем историю треков
+  loadHistory();
+
   // Загружаем станции
   loadStations();
   
@@ -1943,33 +2164,52 @@ document.addEventListener('keydown', (e)=>{
     document.querySelectorAll('.modal.active').forEach(m=>m.classList.remove('active'));
 });
 
-// === AUTO-RECONNECT: Автоматическое переподключение при обрыве потока ===
+// === AUTO-RECONNECT: Автоматическое переподключение при обрыве потока с exponential backoff ===
 let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 10;
+const BASE_RECONNECT_DELAY = 1000; // 1 second
+const MAX_RECONNECT_DELAY = 30000; // 30 seconds
 let reconnectTimeout = null;
+
+// Calculate exponential backoff delay with jitter
+function getReconnectDelay(attempt) {
+  // Exponential backoff: delay = base * 2^attempt
+  const exponentialDelay = BASE_RECONNECT_DELAY * Math.pow(2, attempt);
+  // Cap at MAX_RECONNECT_DELAY
+  const cappedDelay = Math.min(exponentialDelay, MAX_RECONNECT_DELAY);
+  // Add random jitter (0-25% of delay) to prevent thundering herd
+  const jitter = Math.random() * cappedDelay * 0.25;
+  return cappedDelay + jitter;
+}
 
 // Обработчик ошибок audio
 audio.addEventListener('error', (e) => {
   console.error('❌ Audio error:', e);
 
   if (state.isPlaying && state.currentStation && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-    reconnectAttempts++;
-    console.log(`🔄 Attempting reconnect ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}...`);
+    const delay = getReconnectDelay(reconnectAttempts);
+    const delaySeconds = (delay / 1000).toFixed(1);
 
-    // Пробуем переподключиться через 2 секунды
+    reconnectAttempts++;
+    console.log(`🔄 Attempting reconnect ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS} in ${delaySeconds}s...`);
+    showToast(`🔄 Reconnecting in ${delaySeconds}s... (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
+
+    // Пробуем переподключиться с exponential backoff
     clearTimeout(reconnectTimeout);
     reconnectTimeout = setTimeout(() => {
-      if (state.currentStation) {
+      if (state.currentStation && state.isPlaying) {
         console.log('🔄 Reconnecting to:', state.currentStation.name);
         setStream(audio, state.currentStation.url);
         audio.play().then(() => {
           console.log('✅ Reconnected successfully!');
+          showToast('✅ Connection restored!');
           reconnectAttempts = 0; // Сбрасываем счётчик при успешном подключении
         }).catch(err => {
           console.error('❌ Reconnect failed:', err);
+          // Ошибка приведёт к новому вызову error event
         });
       }
-    }, 2000);
+    }, delay);
   } else if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
     console.error('❌ Max reconnect attempts reached. Stopping playback.');
     showToast('❌ Connection lost. Please try another station.');
@@ -2024,5 +2264,210 @@ audio.addEventListener('pause', () => {
 });
 
 console.log('✅ Auto-reconnect handlers initialized');
+
+// === AUDIO FOCUS: Обработка прерываний (звонки, видео, другие медиа) ===
+let audioFocusLost = false;
+let audioFocusWasPlaying = false;
+
+// Используем Page Visibility API для обнаружения переключения вкладок
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    console.log('📱 Page hidden (tab switched or screen locked)');
+    // Не останавливаем воспроизведение - пользователь может слушать в фоне
+  } else {
+    console.log('📱 Page visible (tab active)');
+    // Если была потеря audio focus, пробуем возобновить
+    if (audioFocusLost && audioFocusWasPlaying) {
+      console.log('🔊 Attempting to resume playback after regaining focus');
+      setTimeout(() => {
+        if (state.currentStation && !state.isPlaying) {
+          audio.play().catch(err => {
+            console.log('Cannot auto-resume:', err);
+          });
+        }
+      }, 500);
+    }
+  }
+});
+
+// Используем Audio Session API (если доступен) для обработки прерываний
+if ('mediaSession' in navigator) {
+  // Обработчик прерываний от других медиа (звонки, видео и т.д.)
+  navigator.mediaSession.playbackState = 'playing';
+
+  // Отслеживаем состояние воспроизведения
+  audio.addEventListener('play', () => {
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.playbackState = 'playing';
+    }
+    audioFocusLost = false;
+  });
+
+  audio.addEventListener('pause', () => {
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.playbackState = 'paused';
+    }
+    // Если пауза не была инициирована пользователем, возможно это прерывание
+    if (state.isPlaying) {
+      audioFocusLost = true;
+      audioFocusWasPlaying = true;
+      console.log('⚠️ Audio interrupted (possible phone call or other media)');
+    }
+  });
+}
+
+// Обработка прерываний через Audio element events
+audio.addEventListener('pause', () => {
+  // Если воспроизведение было активно, но пауза произошла без действия пользователя
+  if (state.isPlaying && !audio.ended) {
+    audioFocusWasPlaying = true;
+    console.log('🔇 Audio focus lost, saving state for resume');
+  }
+});
+
+// Пытаемся возобновить при восстановлении фокуса
+audio.addEventListener('canplay', () => {
+  if (audioFocusWasPlaying && audioFocusLost && state.currentStation) {
+    console.log('🔊 Audio focus restored, attempting resume');
+    audio.play().then(() => {
+      audioFocusLost = false;
+      audioFocusWasPlaying = false;
+    }).catch(err => {
+      console.log('Cannot auto-resume:', err);
+    });
+  }
+});
+
+// Обработка user gesture для автозапуска
+let userGestureDetected = false;
+
+// Любое взаимодействие пользователя разрешает автовоспроизведение
+['click', 'touchstart', 'keydown'].forEach(eventType => {
+  document.addEventListener(eventType, () => {
+    if (!userGestureDetected) {
+      userGestureDetected = true;
+      console.log('✅ User gesture detected, autoplay now allowed');
+
+      // Если есть сохраненная станция и включен автозапуск, воспроизводим
+      if (state.resumePlayback && state.currentStation && !state.isPlaying) {
+        console.log('▶️ Auto-resuming playback after user gesture');
+        setTimeout(() => {
+          playStation(state.currentStation);
+        }, 100);
+      }
+    }
+  }, { once: true });
+});
+
+console.log('✅ Audio Focus handlers initialized');
+
+// === KEYBOARD CONTROLS: Управление с клавиатуры для доступности ===
+document.addEventListener('keydown', (e) => {
+  // Игнорируем, если фокус в текстовом поле
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+  // Пробел - Play/Pause
+  if (e.code === 'Space') {
+    e.preventDefault();
+    document.getElementById('playBtn')?.click();
+  }
+
+  // Стрелки влево/вправо - Previous/Next station
+  if (e.code === 'ArrowLeft') {
+    e.preventDefault();
+    document.getElementById('prevBtn')?.click();
+  }
+
+  if (e.code === 'ArrowRight') {
+    e.preventDefault();
+    document.getElementById('nextBtn')?.click();
+  }
+
+  // Стрелки вверх/вниз - Volume control
+  if (e.code === 'ArrowUp') {
+    e.preventDefault();
+    state.volume = Math.min(100, state.volume + 5);
+    audio.volume = state.volume / 100;
+    document.getElementById('volumeFill').style.width = `${state.volume}%`;
+    document.getElementById('volumeSlider')?.setAttribute('aria-valuenow', Math.round(state.volume));
+    saveToStorage();
+    showToast(`🔊 Volume: ${Math.round(state.volume)}%`);
+  }
+
+  if (e.code === 'ArrowDown') {
+    e.preventDefault();
+    state.volume = Math.max(0, state.volume - 5);
+    audio.volume = state.volume / 100;
+    document.getElementById('volumeFill').style.width = `${state.volume}%`;
+    document.getElementById('volumeSlider')?.setAttribute('aria-valuenow', Math.round(state.volume));
+    saveToStorage();
+    showToast(`🔉 Volume: ${Math.round(state.volume)}%`);
+  }
+
+  // M - Mute/Unmute
+  if (e.code === 'KeyM') {
+    e.preventDefault();
+    if (audio.volume > 0) {
+      audio.dataset.previousVolume = audio.volume;
+      audio.volume = 0;
+      state.volume = 0;
+      document.getElementById('volumeFill').style.width = '0%';
+      showToast('🔇 Muted');
+    } else {
+      const prevVolume = parseFloat(audio.dataset.previousVolume || '0.7');
+      audio.volume = prevVolume;
+      state.volume = prevVolume * 100;
+      document.getElementById('volumeFill').style.width = `${state.volume}%`;
+      showToast(`🔊 Volume: ${Math.round(state.volume)}%`);
+    }
+    saveToStorage();
+  }
+
+  // F - Toggle Favorites
+  if (e.code === 'KeyF' && state.currentStation) {
+    e.preventDefault();
+    const isFavorite = state.favorites.some(f => f.url === state.currentStation.url);
+    if (isFavorite) {
+      state.favorites = state.favorites.filter(f => f.url !== state.currentStation.url);
+      showToast('💔 ' + t('removedFromFavorites'));
+    } else {
+      state.favorites.push(state.currentStation);
+      showToast('❤️ ' + t('addedToFavorites'));
+    }
+    saveToStorage();
+    renderStations();
+  }
+
+  // S - Search focus
+  if (e.code === 'KeyS' && !e.ctrlKey && !e.metaKey) {
+    e.preventDefault();
+    document.getElementById('searchInput')?.focus();
+  }
+
+  // Escape - Clear search or close modals (already handled above)
+  // T - Timer modal
+  if (e.code === 'KeyT') {
+    e.preventDefault();
+    document.getElementById('timerBtn')?.click();
+  }
+
+  // A - Alarm modal
+  if (e.code === 'KeyA') {
+    e.preventDefault();
+    document.getElementById('alarmBtn')?.click();
+  }
+});
+
+console.log('✅ Keyboard controls initialized');
+console.log('⌨️ Keyboard shortcuts:');
+console.log('  Space: Play/Pause');
+console.log('  ←/→: Previous/Next station');
+console.log('  ↑/↓: Volume up/down');
+console.log('  M: Mute/Unmute');
+console.log('  F: Toggle favorite');
+console.log('  S: Focus search');
+console.log('  T: Sleep timer');
+console.log('  A: Alarm');
+console.log('  Esc: Close modals');
 
 // End of app.js

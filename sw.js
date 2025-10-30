@@ -1,14 +1,21 @@
-const CACHE_NAME = 'grulya-fm-v2';
-const STATIC_CACHE = 'grulya-fm-static-v4';
-const DYNAMIC_CACHE = 'grulya-fm-dynamic-v4';
+const CACHE_NAME = 'grulya-fm-v5';
+const STATIC_CACHE = 'grulya-fm-static-v5';
+const DYNAMIC_CACHE = 'grulya-fm-dynamic-v5';
+const IMAGE_CACHE = 'grulya-fm-images-v5';
+const OFFLINE_URL = '/offline.html';
 
 const urlsToCache = [
   "/",
   "/index.html",
+  "/app.js",
   "/manifest.json",
   "/favicon.ico",
   "/icon-72.png",
-  "/sw.js"
+  "/icon-96.png",
+  "/icon-144.png",
+  "/icon-192.png",
+  "/icon-512.png",
+  OFFLINE_URL
 ];
 
 // Install event - cache static resources
@@ -31,7 +38,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
+          if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE && cacheName !== IMAGE_CACHE) {
             console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
@@ -41,7 +48,22 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch event - serve from cache, fallback to network
+// Stale-while-revalidate helper
+async function staleWhileRevalidate(request, cacheName) {
+  const cached = await caches.match(request);
+
+  const fetchPromise = fetch(request).then(response => {
+    if (response && response.status === 200) {
+      const copy = response.clone();
+      caches.open(cacheName).then(cache => cache.put(request, copy));
+    }
+    return response;
+  }).catch(() => cached);
+
+  return cached || fetchPromise;
+}
+
+// Fetch event - advanced caching strategies
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
@@ -49,17 +71,27 @@ self.addEventListener('fetch', (event) => {
   // Only handle GET over http/https
   if (request.method !== 'GET' || !url.protocol.startsWith('http')) return;
 
+  // Skip radio streams - never cache audio streams
+  if (url.pathname.includes('/stream') ||
+      url.pathname.includes('/radio') ||
+      url.pathname.endsWith('.m3u') ||
+      url.pathname.endsWith('.pls') ||
+      url.pathname.endsWith('.m3u8') ||
+      request.headers.get('accept')?.includes('audio/')) {
+    return; // Let it go directly to network
+  }
+
   const accepts = request.headers.get('accept') || '';
   const dest = request.destination;
   const isHTML = request.mode === 'navigate' || accepts.includes('text/html') || dest === 'document';
   const isCSSorJS = dest === 'style' || dest === 'script';
+  const isImage = dest === 'image' || accepts.includes('image/');
 
-  // Network-first for HTML and critical assets (CSS/JS) to avoid stale UI
+  // Network-first for HTML and critical assets (CSS/JS) with offline fallback
   if (isHTML || isCSSorJS) {
     event.respondWith(
       fetch(request)
         .then(response => {
-          // Update cached copy
           const copy = response.clone();
           caches.open(STATIC_CACHE).then(cache => {
             const key = isHTML ? '/index.html' : request;
@@ -67,20 +99,35 @@ self.addEventListener('fetch', (event) => {
           });
           return response;
         })
-        .catch(() => {
-          if (isHTML) return caches.match('/index.html');
-          return caches.match(request);
+        .catch(async () => {
+          const cached = await caches.match(request);
+          if (cached) return cached;
+
+          // Return offline page for navigation requests
+          if (isHTML) {
+            return caches.match(OFFLINE_URL) || new Response(
+              '<h1>Offline</h1><p>No internet connection. Please check your network.</p>',
+              { headers: { 'Content-Type': 'text/html' } }
+            );
+          }
+          return cached;
         })
     );
     return;
   }
 
-  // Cache-first for other GET requests with network fallback
+  // Stale-while-revalidate for images (album art, station logos)
+  if (isImage) {
+    event.respondWith(staleWhileRevalidate(request, IMAGE_CACHE));
+    return;
+  }
+
+  // Cache-first for other assets (icons, fonts)
   event.respondWith(
     caches.match(request).then(cached => {
       if (cached) return cached;
       return fetch(request).then(networkResp => {
-        if (networkResp && networkResp.status === 200 && networkResp.type === 'basic') {
+        if (networkResp && networkResp.status === 200) {
           const copy = networkResp.clone();
           caches.open(DYNAMIC_CACHE).then(cache => cache.put(request, copy));
         }
