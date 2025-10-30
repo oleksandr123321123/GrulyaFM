@@ -49,7 +49,7 @@
       "name": "Random Station",
       "short_name": "Random",
       "description": "Play random radio station",
-      "url": "/?random=true",
+      "url": "https://grulya-fm.vercel.app/?random=true",
       "icons": [
         {
           "src": "/icon-96.png",
@@ -61,7 +61,7 @@
       "name": "Favorites",
       "short_name": "Favorites",
       "description": "Open favorite stations",
-      "url": "/?tab=favorites",
+      "url": "https://grulya-fm.vercel.app/?tab=favorites",
       "icons": [
         {
           "src": "/icon-96.png",
