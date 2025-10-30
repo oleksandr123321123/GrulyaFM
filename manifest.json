@@ -19,7 +19,7 @@
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-96.png",
+      "src": "https://grulya-fm.vercel.app/icon-96.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any maskable"
@@ -51,7 +51,7 @@
       "url": "https://grulya-fm.vercel.app/?random=true",
       "icons": [
         {
-          "src": "/icon-96.png",
+          "src": "https://grulya-fm.vercel.app/icon-96.png",
           "sizes": "96x96"
         }
       ]
@@ -63,7 +63,7 @@
       "url": "https://grulya-fm.vercel.app/?tab=favorites",
       "icons": [
         {
-          "src": "/icon-96.png",
+          "src": "https://grulya-fm.vercel.app/icon-96.png",
           "sizes": "96x96"
         }
       ]
