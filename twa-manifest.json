@@ -14,7 +14,6 @@
   "startUrl": "/",
   "iconUrl": "https://grulya-fm.vercel.app/icon-512.png",
   "maskableIconUrl": "https://grulya-fm.vercel.app/icon-512.png",
-  "monochromeIconUrl": "https://grulya-fm.vercel.app/icon-monochrome.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "./upload.keystore",
