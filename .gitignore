@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
 
 # Android Signing Keys (CRITICAL - DO NOT COMMIT)
 *.keystore
