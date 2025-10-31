@@ -152,8 +152,10 @@ jobs:
   build-android:
     name: Build Android App
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') && github.event.repository.fork == false
     needs: [lint, security]
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
