@@ -173,42 +173,83 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+
       - name: Install Bubblewrap CLI
         run: npm install -g @bubblewrap/cli
 
-      - name: Build TWA
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses || true
+
+      - name: Update Bubblewrap project
         run: |
-          # Skip Bubblewrap for now - project should be pre-initialized
-          echo "❌ Android build temporarily disabled"
-          echo "⚠️ Bubblewrap has issues with Web Manifest validation"
-          echo "📝 TODO: Create Android project manually and commit to repo"
-          exit 0
+          echo "Updating Bubblewrap TWA project..."
+          echo "1.0.0" | npx @bubblewrap/cli update --manifest=twa-manifest.json || true
+
+      - name: Build Android App Bundle
+        run: |
+          echo "Building Android App Bundle..."
+
+          # Build with Gradle directly
+          if [ -f "gradlew" ]; then
+            chmod +x gradlew
+            ./gradlew bundleRelease --stacktrace
+          else
+            echo "❌ gradlew not found"
+            exit 1
+          fi
         env:
           BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+      - name: Find AAB file
+        run: |
+          echo "Searching for AAB file..."
+          find . -name "*.aab" -type f
+
+          AAB_PATH=$(find . -name "*.aab" -type f | head -1)
+          if [ -z "$AAB_PATH" ]; then
+            echo "❌ No AAB file found"
+            exit 1
+          fi
+
+          echo "✅ Found AAB: $AAB_PATH"
+          echo "AAB_PATH=$AAB_PATH" >> $GITHUB_ENV
+
+          # Show file size
+          ls -lh "$AAB_PATH"
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release-aab
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          path: ${{ env.AAB_PATH }}
           retention-days: 30
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: android/app/build/outputs/bundle/release/app-release.aab
+          files: ${{ env.AAB_PATH }}
           draft: true
           body: |
             ## GrulyaFM Release ${{ github.ref_name }}
 
-            ### Changes
-            - See commit history for details
+            ### 📦 Android App Bundle
 
-            ### Installation
+            Ready for Google Play Store upload!
+
+            ### Installation Steps
             1. Download `app-release.aab`
-            2. Upload to Google Play Console
-            3. Submit for review
+            2. Go to [Google Play Console](https://play.google.com/console)
+            3. Upload to Production or Internal Testing track
+            4. Submit for review
+
+            ### Changes
+            See [commit history](https://github.com/${{ github.repository }}/commits/${{ github.ref_name }}) for details.
+
+            ---
+            🤖 Built with [Bubblewrap CLI](https://github.com/GoogleChromeLabs/bubblewrap) & GitHub Actions
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
