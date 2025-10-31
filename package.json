@@ -29,7 +29,7 @@
     "global",
     "web-audio"
   ],
-  "author": "GrulyaFM Team",
+  "author": "LisinO",
   "license": "MIT",
   "dependencies": {
     "express": "^4.21.2",
