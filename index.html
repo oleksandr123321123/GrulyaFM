@@ -195,7 +195,7 @@
     .btn-circle.sm{
       min-width:clamp(42px, 6vw, 52px); min-height:clamp(42px, 6vw, 52px);
       padding:.6rem; background: var(--bg-elev); color:var(--text);
-      border:1.5px solid var(--border); box-shadow:none;
+      border:1.5px solid var(--border); box-shadow:none; line-height:1;
     }
     .btn-circle:hover{transform: translateY(-2px) scale(1.02)}
     .volume{ display:flex; align-items:center; gap:10px; margin-top:8px; }
@@ -331,8 +331,18 @@
     #miniTitle{font-weight:700; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
     #miniMeta{color:var(--muted); font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px}
     .mp-controls{display:flex; align-items:center; gap:6px; flex-shrink:0}
-    .mp-btn{ width:36px; height:36px; border-radius:10px; border:1.5px solid var(--border); background: var(--bg-elev); color:var(--text); font-size:14px; cursor:pointer; display:grid; place-items:center }
-    .mp-btn.main{ background: linear-gradient(135deg, var(--primary), var(--accent)); color:#fff; border-color:transparent; width:40px; height:40px; font-size:16px }
+    .mp-btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:36px; min-height:36px; padding:.5rem;
+      border-radius:10px; border:1.5px solid var(--border);
+      background: var(--bg-elev); color:var(--text);
+      font-size:14px; cursor:pointer; line-height:1;
+    }
+    .mp-btn.main{
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color:#fff; border-color:transparent;
+      min-width:40px; min-height:40px; font-size:16px;
+    }
     @media (min-width: 641px){ .mini{display:none !important} }
     .mobile-dock{
       position: fixed; left:8px; right:8px; z-index:30;
