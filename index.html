@@ -62,7 +62,7 @@
     }
     /* Fallback for old iOS/Safari that don't support clamp() */
     @supports not (width: clamp(1px, 1vw, 1px)) {
-      .brand .logo{width:40px!important; height:40px!important; font-size:22px!important}
+      .brand .logo{min-width:40px!important; min-height:40px!important; font-size:22px!important}
       .brand .title{font-size:20px!important}
       .icon-btn{min-width:40px!important; min-height:40px!important; font-size:18px!important}
       .btn{min-height:48px!important; font-size:16px!important}
@@ -115,8 +115,9 @@
     .toolbar{ display:flex; align-items:center; gap:10px; justify-content:space-between; }
     .brand{ display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.3px; }
     .brand .logo{
-      width:40px; height:40px; border-radius:12px;
-      display:grid; place-items:center; font-size:22px;
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:40px; min-height:40px; padding:.5rem; border-radius:12px;
+      font-size:22px; line-height:1;
       background: linear-gradient(135deg, var(--primary), var(--accent));
       box-shadow: 0 6px 18px rgba(109,120,255,.4);
       transform: translateZ(0);
@@ -126,8 +127,8 @@
     .searchbar{ display:flex; align-items:center; gap:10px; flex:1; max-width:clamp(320px, 32vw, 720px); margin:0 12px; }
     .searchbar input{
       width:100%; padding:12px 14px 12px 16px; border-radius:12px; border:1.5px solid var(--border);
-      background: var(--bg-elev); color:var(--text); font-size:15px; outline:none; transition:.25s;
-      box-shadow: inset 0 -1px 0 rgba(255,255,255,.03);
+      background: var(--bg-elev); color:var(--text); font-size:15px; line-height:1.4;
+      outline:none; transition:.25s; box-shadow: inset 0 -1px 0 rgba(255,255,255,.03);
     }
     .searchbar input:focus{border-color:var(--primary); box-shadow: var(--ring)}
     .icon-btn{
@@ -230,15 +231,27 @@
     .station-details{flex:1; min-width:0; overflow: hidden;}
     .station-title{font-weight:800; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
     .station-country{color:var(--muted); font-size:12px; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-    .fav-btn{ background:none; border:none; font-size:clamp(18px, 2.2vw, 22px); cursor:pointer; transition:.18s; width:clamp(36px, 5vw, 44px); height:clamp(36px, 5vw, 44px); border-radius:12px; flex-shrink: 0; }
+    .fav-btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:clamp(36px, 5vw, 44px); min-height:clamp(36px, 5vw, 44px);
+      padding:.5rem; background:none; border:none; border-radius:12px;
+      font-size:clamp(18px, 2.2vw, 22px); line-height:1;
+      cursor:pointer; transition:.18s; flex-shrink:0;
+    }
     .fav-btn:hover{transform: scale(1.12)}
-    .delete-btn{ background:none; border:1.5px solid var(--border); font-size:clamp(14px, 1.6vw, 16px); cursor:pointer; opacity:.8; width:clamp(36px, 5vw, 44px); height:clamp(36px, 5vw, 44px); border-radius:12px; display:grid; place-items:center; flex-shrink: 0; }
+    .delete-btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:clamp(36px, 5vw, 44px); min-height:clamp(36px, 5vw, 44px);
+      padding:.5rem; background:none; border:1.5px solid var(--border); border-radius:12px;
+      font-size:clamp(14px, 1.6vw, 16px); line-height:1;
+      cursor:pointer; opacity:.8; transition:.18s; flex-shrink:0;
+    }
     .delete-btn:hover{opacity:1; transform:scale(1.05); border-color:var(--accent)}
     .station-card.compact{padding:8px 10px !important; border-radius:12px !important}
     .station-card.compact .station-icon{font-size:20px !important}
     .station-card.compact .station-title{font-size:14px !important; font-weight:700}
     .station-card.compact .station-country{font-size:11px !important; opacity:.8}
-    .station-card.compact .fav-btn{font-size:18px !important; width:34px; height:34px}
+    .station-card.compact .fav-btn{font-size:18px !important; min-width:34px; min-height:34px}
 
     /* Alarm & Timer pills */
     .pill{display:none}
@@ -261,18 +274,30 @@
     @keyframes mshow{from{transform:translateY(6px); opacity:.6} to{transform:none; opacity:1}}
     .mhead{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px}
     .mtitle{font-weight:900}
-    .x{width:clamp(36px, 5vw, 44px); height:clamp(36px, 5vw, 44px); display:grid; place-items:center; border-radius:12px; border:1.5px solid var(--border); background:var(--bg-elev); cursor:pointer}
+    .x{
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:clamp(36px, 5vw, 44px); min-height:clamp(36px, 5vw, 44px);
+      padding:.5rem; border-radius:12px; border:1.5px solid var(--border);
+      background:var(--bg-elev); line-height:1; cursor:pointer;
+    }
     .set-sec{margin:14px 0}
     .sec-title{color:var(--muted); font-weight:800; margin-bottom:8px}
     .lang-grid{display:grid; grid-template-columns: repeat(2, 1fr); gap:10px}
     .lang-item{border:1.5px solid var(--border); border-radius:12px; padding:12px; text-align:center; cursor:pointer; background:var(--bg-elev)}
     .lang-item.active{background: linear-gradient(135deg, var(--primary), var(--accent)); color:#fff; border-color:transparent}
     .set-item{display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px dashed var(--border)}
-    .checkbox{width:24px; height:24px; border:1.5px solid var(--border); border-radius:8px; display:grid; place-items:center}
+    .checkbox{
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:24px; min-height:24px; padding:4px;
+      border:1.5px solid var(--border); border-radius:8px; line-height:1;
+    }
     .checkbox.checked{background:var(--primary); border-color:transparent; color:#fff; font-weight:900}
     .input{margin:10px 0}
     label{display:block; font-size:13px; color:var(--muted); margin-bottom:6px}
-    .field{width:100%; border:1.5px solid var(--border); background:var(--bg-elev); color:var(--text); border-radius:12px; padding:12px; outline:none}
+    .field{
+      width:100%; border:1.5px solid var(--border); background:var(--bg-elev);
+      color:var(--text); border-radius:12px; padding:12px; line-height:1.4; outline:none;
+    }
     .field:focus{border-color:var(--primary); box-shadow: var(--ring)}
     .btn{
       width:100%; min-height:clamp(44px, 5vw, 52px); border:none; border-radius:12px; cursor:pointer;
