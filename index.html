@@ -75,8 +75,9 @@
     .wrap{max-width:var(--maxw); width:min(100%, 92vw); margin:0 auto; padding:16px; display:grid; gap:16px}
     header.appbar{
       position:sticky; top:0; z-index:20;
+      -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
-      background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,0));
+      background: linear-gradient(180deg, rgba(0,0,0,.5), rgba(0,0,0,0));
       padding: 10px 0 6px;
     }
     .toolbar{ display:flex; align-items:center; gap:10px; justify-content:space-between; }
@@ -100,6 +101,8 @@
     .icon-btn{
       display:grid; place-items:center; border-radius:12px; width:clamp(36px, 4.5vw, 44px); height:clamp(36px, 4.5vw, 44px); border:1.5px solid var(--border);
       background: var(--glass); color:var(--text); font-size:clamp(16px, 1.6vw, 20px); cursor:pointer; transition:.2s;
+      -webkit-appearance: none;
+      -webkit-tap-highlight-color: transparent;
     }
     .icon-btn:hover{transform:translateY(-2px); border-color:var(--primary); box-shadow:0 8px 18px rgba(0,0,0,.25)}
     .hero{
@@ -151,6 +154,8 @@
     .btn-circle{
       width:clamp(48px, 7vw, 60px); height:clamp(48px, 7vw, 60px); border-radius:50%; border:none; cursor:pointer; display:grid; place-items:center; font-size:clamp(18px, 2vw, 22px);
       background: linear-gradient(180deg, var(--primary), var(--primary-2)); color:white; box-shadow: 0 8px 22px rgba(109,120,255,.45); transition:.18s;
+      -webkit-appearance: none;
+      -webkit-tap-highlight-color: transparent;
     }
     .btn-circle.sm{width:clamp(42px, 6vw, 52px); height:clamp(42px, 6vw, 52px); background: var(--bg-elev); color:var(--text); border:1.5px solid var(--border); box-shadow:none}
     .btn-circle:hover{transform: translateY(-2px) scale(1.02)}
@@ -234,6 +239,10 @@
       width:100%; height:clamp(44px, 5vw, 52px); border:none; border-radius:12px; cursor:pointer;
       background: linear-gradient(135deg, var(--primary), var(--accent)); color:#fff; font-weight:900;
       box-shadow: 0 10px 24px rgba(109,120,255,.35); transition:.18s;
+      -webkit-appearance: none;
+      -webkit-tap-highlight-color: transparent;
+      font-family: inherit;
+      font-size: inherit;
     }
     .btn:hover{transform: translateY(-1px)}
     .btn-ghost{
