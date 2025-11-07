@@ -68,6 +68,7 @@
       .btn{min-height:48px!important; font-size:16px!important}
       .btn-circle{min-width:56px!important; min-height:56px!important; font-size:20px!important}
       .btn-circle.sm{min-width:46px!important; min-height:46px!important}
+      .action-btn{min-width:44px!important; min-height:44px!important; font-size:18px!important}
       #stationName{font-size:20px!important}
       #bannerTitle{font-size:24px!important}
       #bannerText{font-size:16px!important}
@@ -341,10 +342,11 @@
     /* Горизонтальная панель действий */
     .actions-row{ display:flex; gap:10px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
     .action-btn{
-      width:clamp(40px, 5.6vw, 48px); height:clamp(40px, 5.6vw, 48px); border-radius:12px;
-      border:1.5px solid var(--border);
-      background: var(--bg-elev); color: var(--text); font-size:clamp(16px, 2vw, 20px); cursor:pointer;
-      transition:.18s;
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:clamp(40px, 5.6vw, 48px); min-height:clamp(40px, 5.6vw, 48px);
+      padding:.6rem; border-radius:12px; border:1.5px solid var(--border);
+      background: var(--bg-elev); color: var(--text); font-size:clamp(16px, 2vw, 20px);
+      cursor:pointer; transition:.18s; line-height:1;
     }
     .action-btn:hover{ transform: translateY(-2px); border-color: var(--primary); }
     .quick, .quick-vert{ display:none !important; }
