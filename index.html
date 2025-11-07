@@ -298,9 +298,22 @@
     .weekday{border:1.5px solid var(--border); border-radius:10px; padding:10px 0; text-align:center; font-size:12px; cursor:pointer; background:var(--bg-elev)}
     .weekday.active{background:var(--primary); color:#fff; border-color:transparent}
     .toast{
-      position: fixed; left:50%; bottom:26px; transform:translateX(-50%);
-      padding:12px 16px; border-radius:999px; background: var(--bg-elev); border:1.5px solid var(--border); box-shadow: var(--shadow); z-index:60;
-      animation: mshow .2s ease;
+      position: fixed; top:16px; left:50%; transform:translateX(-50%) translateY(-100px);
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 16px; border-radius:12px;
+      background: var(--bg-elev); border:1.5px solid var(--border);
+      box-shadow: 0 8px 24px rgba(0,0,0,.15); z-index:9999;
+      opacity:0; transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size:14px; line-height:1.4; max-width:90vw;
+    }
+    .toast-show{
+      opacity:1; transform:translateX(-50%) translateY(0);
+    }
+    .toast-icon{
+      font-size:18px; line-height:1; flex-shrink:0;
+    }
+    .toast-msg{
+      font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
 
     /* MINI + dock - Минималистичный дизайн */

@@ -35,6 +35,7 @@ const TRANSLATIONS = {
     setAlarm: 'Set Alarm',
     cancelAlarm: 'Cancel Alarm',
     connecting: 'Connecting...',
+    connectionError: 'Connection failed',
     live: 'Live',
     addedToFav: 'Added to favorites',
     removedFromFav: 'Removed from favorites',
@@ -89,6 +90,7 @@ const TRANSLATIONS = {
     setAlarm: 'Установить будильник',
     cancelAlarm: 'Отменить будильник',
     connecting: 'Подключение...',
+    connectionError: 'Ошибка подключения',
     live: 'Прямой эфир',
     addedToFav: 'Добавлено в избранное',
     removedFromFav: 'Удалено из избранного',
@@ -143,6 +145,7 @@ const TRANSLATIONS = {
     setAlarm: 'Wecker stellen',
     cancelAlarm: 'Wecker abbrechen',
     connecting: 'Verbinden...',
+    connectionError: 'Verbindung fehlgeschlagen',
     live: 'Live',
     addedToFav: 'Zu Favoriten hinzugefügt',
     removedFromFav: 'Aus Favoriten entfernt',
@@ -197,6 +200,7 @@ const TRANSLATIONS = {
     setAlarm: 'Définir l\'alarme',
     cancelAlarm: 'Annuler l\'alarme',
     connecting: 'Connexion...',
+    connectionError: 'Échec de connexion',
     live: 'En direct',
     addedToFav: 'Ajouté aux favoris',
     removedFromFav: 'Retiré des favoris',
@@ -251,6 +255,7 @@ const TRANSLATIONS = {
     setAlarm: 'Establecer alarma',
     cancelAlarm: 'Cancelar alarma',
     connecting: 'Conectando...',
+    connectionError: 'Error de conexión',
     live: 'En vivo',
     addedToFav: 'Añadido a favoritos',
     removedFromFav: 'Eliminado de favoritos',
@@ -305,6 +310,7 @@ const TRANSLATIONS = {
     setAlarm: 'Definir alarme',
     cancelAlarm: 'Cancelar alarme',
     connecting: 'Conectando...',
+    connectionError: 'Falha na conexão',
     live: 'Ao vivo',
     addedToFav: 'Adicionado aos favoritos',
     removedFromFav: 'Removido dos favoritos',
@@ -359,6 +365,7 @@ const TRANSLATIONS = {
     setAlarm: 'Imposta sveglia',
     cancelAlarm: 'Annulla sveglia',
     connecting: 'Connessione...',
+    connectionError: 'Connessione fallita',
     live: 'In diretta',
     addedToFav: 'Aggiunto ai preferiti',
     removedFromFav: 'Rimosso dai preferiti',
@@ -413,6 +420,7 @@ const TRANSLATIONS = {
     setAlarm: 'Встановити будильник',
     cancelAlarm: 'Скасувати будильник',
     connecting: 'Підключення...',
+    connectionError: 'Помилка підключення',
     live: 'Прямий ефір',
     addedToFav: 'Додано до обраного',
     removedFromFav: 'Видалено з обраного',
@@ -467,6 +475,7 @@ const TRANSLATIONS = {
     setAlarm: '设置闹钟',
     cancelAlarm: '取消闹钟',
     connecting: '连接中...',
+    connectionError: '连接失败',
     live: '直播',
     addedToFav: '已添加到收藏',
     removedFromFav: '已从收藏中移除',
@@ -521,6 +530,7 @@ const TRANSLATIONS = {
     setAlarm: 'アラームを設定',
     cancelAlarm: 'アラームをキャンセル',
     connecting: '接続中...',
+    connectionError: '接続に失敗しました',
     live: 'ライブ',
     addedToFav: 'お気に入りに追加',
     removedFromFav: 'お気に入りから削除',
@@ -660,14 +670,14 @@ async function saveToSupabase() {
 
     if (error) {
       console.error('❌ Supabase save error:', error);
-      showToast('⚠️ Sync error: ' + error.message);
+      showToast('Sync error: ' + error.message, 'error');
     } else {
       console.log('✅ Saved to Supabase successfully');
-      showToast('✅ Synced to cloud');
+      showToast('Synced to cloud', 'sync');
     }
   } catch (error) {
     console.error('❌ Save exception:', error);
-    showToast('⚠️ Sync failed');
+    showToast('Sync failed', 'error');
   }
 }
 
@@ -738,7 +748,7 @@ async function loadFromSupabase() {
     // Сохраняем локально тоже
     saveToLocalStorage();
     
-    showToast('☁️ Loaded from cloud');
+    showToast('Loaded from cloud', 'sync');
     return true;
 
   } catch (error) {
@@ -831,7 +841,7 @@ window.supabase?.auth.onAuthStateChange(async (event, session) => {
   console.log('🔐 Auth state changed:', event);
   
   if (event === 'SIGNED_IN') {
-    showToast('🔓 Signed in!');
+    showToast('Signed in!', 'success');
     // Загружаем данные из облака
     await loadFromSupabase();
     // Обновляем UI
@@ -845,7 +855,7 @@ window.supabase?.auth.onAuthStateChange(async (event, session) => {
       renderStations();
     }
   } else if (event === 'SIGNED_OUT') {
-    showToast('🚪 Signed out');
+    showToast('Signed out', 'info');
   } else if (event === 'TOKEN_REFRESHED') {
     console.log('🔄 Token refreshed');
   }
@@ -853,14 +863,14 @@ window.supabase?.auth.onAuthStateChange(async (event, session) => {
 
 // Кнопка ручной синхронизации
 document.getElementById('btnSyncNow')?.addEventListener('click', async () => {
-  showToast('🔄 Syncing...');
+  showToast('Syncing...', 'sync');
   await saveToSupabase();
 });
 
 // Sign out button
 document.getElementById('btnSignOut')?.addEventListener('click', async () => {
   await window.supabase.auth.signOut();
-  showToast('👋 Вы вышли');
+  showToast('Вы вышли', 'info');
 });
 
 document.getElementById('btnSyncNow')?.addEventListener('click', async () => {
@@ -968,13 +978,37 @@ function t(key) {
   return TRANSLATIONS[state.language][key] || TRANSLATIONS['en'][key] || key;
 }
 
-// Show toast notification
-function showToast(message) {
+// Show toast notification with icon based on type
+function showToast(message, type = 'info') {
+  const icons = {
+    info: '💬',
+    success: '✅',
+    error: '⚠️',
+    warning: '⚡',
+    play: '▶️',
+    prev: '⏮️',
+    next: '⏭️',
+    favorite: '❤️',
+    unfavorite: '💔',
+    sync: '☁️',
+    timer: '⏲️',
+    language: '🌍'
+  };
+
+  const icon = icons[type] || icons.info;
   const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.textContent = message;
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-msg">${message}</span>`;
   document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
+
+  // Анимация появления
+  setTimeout(() => toast.classList.add('toast-show'), 10);
+
+  // Удаление через 3 секунды
+  setTimeout(() => {
+    toast.classList.remove('toast-show');
+    setTimeout(() => toast.remove(), 200);
+  }, 3000);
 }
 
 // === WAKE LOCK API для предотвращения блокировки экрана ===
@@ -1240,7 +1274,7 @@ if ('connection' in navigator) {
       if (state.preferredBitrate === 'auto' && state.isPlaying && state.currentStation) {
         const newQuality = getNetworkQuality();
         console.log(`📶 Network changed, recommended bitrate: ${newQuality} kbps`);
-        showToast(`📶 Network quality changed`);
+        showToast('Network quality changed', 'info');
 
         // Можно автоматически переключить поток если сеть ухудшилась
         // Но это может прервать воспроизведение, поэтому оставляем на усмотрение пользователя
@@ -1299,7 +1333,7 @@ function updateMediaSession(station) {
       const prevStation = stations[prevIndex];
 
       playStation(prevStation);
-      showToast(`⏮️ ${prevStation.name}`);
+      showToast(prevStation.name, 'prev');
     });
 
     // Next track - play next station in list
@@ -1312,7 +1346,7 @@ function updateMediaSession(station) {
       const nextStation = stations[nextIndex];
 
       playStation(nextStation);
-      showToast(`⏭️ ${nextStation.name}`);
+      showToast(nextStation.name, 'next');
     });
 
     // Seek backward (optional - skip 10 seconds back if stream supports it)
@@ -1346,10 +1380,10 @@ async function loadStations() {
     allStations.MY = state.myStations;
     renderTabs();
     renderStations();
-    showToast('🎵 ' + t('bannerText'));
+    showToast(t('bannerText'), 'success');
   } catch (error) {
     console.error('Error loading stations:', error);
-    showToast('❌ Error loading stations.json');
+    showToast('Error loading stations.json', 'error');
     allStations = { MY: state.myStations };
   }
 }
@@ -1553,7 +1587,7 @@ function playStation(station) {
     state.isPlaying = true;
     document.getElementById('playBtn').textContent = '⏸️';
     document.getElementById('trackMetadata').textContent = `${station.country} • ${t('live')} • ${station.bitrate ?? 128} kbps`;
-    showToast(`▶️ ${station.name}`);
+    showToast(station.name, 'play');
 
     // Активируем Wake Lock для предотвращения блокировки экрана
     await requestWakeLock();
@@ -1574,7 +1608,7 @@ function playStation(station) {
     renderStations();
     updateMiniPlayer();
   }).catch(() => {
-    showToast('❌ ' + t('connecting'));
+    showToast(t('connectionError') || 'Connection failed', 'error');
     state.isPlaying = false;
     document.getElementById('playBtn').textContent = '▶️';
     updateMiniPlayer();
@@ -1586,10 +1620,10 @@ function toggleFavorite(id) {
   const index = state.favorites.indexOf(id);
   if (index > -1) {
     state.favorites.splice(index, 1);
-    showToast('💔 ' + t('removedFromFav'));
+    showToast(t('removedFromFav'), 'unfavorite');
   } else {
     state.favorites.push(id);
-    showToast('❤️ ' + t('addedToFav'));
+    showToast(t('addedToFav'), 'favorite');
   }
   saveToStorage();
   renderStations();
@@ -1610,7 +1644,7 @@ function renderLanguageGrid() {
       saveToStorage();
       renderLanguageGrid();
       updateUI();
-      showToast(`🌍 ${LANGUAGE_NAMES[item.dataset.lang]}`);
+      showToast(LANGUAGE_NAMES[item.dataset.lang], 'language');
     });
   });
 }
@@ -1778,7 +1812,7 @@ function checkAlarm() {
 
       // Запускаем станцию
       playStation(station);
-      showToast('⏲️ ' + t('goodMorning'));
+      showToast(t('goodMorning'), 'timer');
     }
   }
 }
