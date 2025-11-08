@@ -65,22 +65,14 @@
       { "name": "Hot 97", "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/WQHTFMAAC.aac", "bitrate": 128 }
     ],
     "UA": [
+      { "name": "Hit FM Ukraine", "url": "https://online.hitfm.ua/HitFM_HD", "bitrate": 320 },
+      { "name": "Kiss FM", "url": "https://online.kissfm.ua/KissFM_HD", "bitrate": 320 },
+      { "name": "Krayina FM", "url": "http://185.65.245.34:8000/kiev", "bitrate": 128 },
       { "name": "Radio ROKS", "url": "https://online.radioroks.ua/RadioROKS", "bitrate": 320 },
       { "name": "Nashe Radio", "url": "https://online.nasheradio.ua/NasheRadio", "bitrate": 320 },
-      { "name": "Krayina FM", "url": "http://185.65.245.34:8000/kiev", "bitrate": 128 },
       { "name": "Pershe Miske Radio", "url": "https://live.1tv.od.ua/radio/stream/icecast.audio", "bitrate": 320 },
-      { "name": "Radio Relax UA", "url": "https://online.radiorelax.ua/RadioRelax_HD", "bitrate": 320 },
-      { "name": "Radio Jazz", "url": "https://online.radiojazz.fm/RadioJazz", "bitrate": 320 },
-      { "name": "Lviv Wave", "url": "https://cast.lviv.fm/lvivwave", "bitrate": 128 },
-      { "name": "Radio Культура", "url": "https://stream.ukr.radio/ur/ur1-mp3-128.m3u", "bitrate": 128 },
-      { "name": "Ukrainian Radio", "url": "https://stream.ukr.radio/ur/ur-mp3-128.m3u", "bitrate": 128 },
-      { "name": "Radio PROSTO", "url": "https://online.radioroks.ua/RadioROKS_METAL", "bitrate": 320 },
-      { "name": "Radio NV", "url": "https://online.radionv.ua/RadioNV", "bitrate": 320 },
-      { "name": "Radio Tochka", "url": "https://online.radiotochka.ua/RadioTochka", "bitrate": 320 },
-      { "name": "Smooth Jazz UA", "url": "https://online.smoothjazz.ua/SmoothJazz_HD", "bitrate": 128 },
       { "name": "Europa Plus UA", "url": "http://217.20.173.105:8100/live", "bitrate": 128 },
-      { "name": "Kiss FM", "url": "https://online.kissfm.ua/KissFM_HD", "bitrate": 320 },
-      { "name": "Hit FM Ukraine", "url": "https://online.hitfm.ua/HitFM_HD", "bitrate": 320 }
+      { "name": "Bar FM", "url": "http://176.105.207.222:8000/barfm_live320", "bitrate": 128 }
     ],
     "IT": [
       { "name": "Radio Italia", "url": "https://radioitaliasmi.akamaized.net/hls/live/2093120/RISMI/stream01/streamPlaylist.m3u8", "bitrate": 128 },
